@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
+import Header from '@/components/Header'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 // Google Font'u yükle
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -31,8 +33,12 @@ export default function RootLayout({
         />
       </head>
       <body className={plusJakartaSans.variable}>
-        {/* Tüm sayfalar buraya gelecek */}
-        {children}
+        <AuthProvider>
+          <div className="relative flex min-h-screen w-full flex-col">
+            <Header />
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )
