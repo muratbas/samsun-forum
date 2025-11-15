@@ -6,6 +6,7 @@ import { upvotePost, downvotePost, getUserVote } from '@/lib/votes'
 import { Post } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
+import { Linkify } from '@/lib/linkify'
 
 interface PostCardProps {
   post: Post
@@ -170,13 +171,13 @@ export default function PostCard({ post }: PostCardProps) {
 
             {/* Başlık */}
             <h3 className="text-lg font-bold leading-tight hover:text-primary cursor-pointer">
-              {post.title}
+              <Linkify text={post.title} />
             </h3>
 
             {/* İçerik */}
             {post.content && (
               <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal line-clamp-3">
-                {post.content}
+                <Linkify text={post.content} />
               </p>
             )}
 
