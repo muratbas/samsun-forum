@@ -4,7 +4,7 @@ export default function RightSidebar() {
       <div className="sticky top-24 flex flex-col gap-6">
         {/* Samsun'da Gündem */}
         <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4">
-          <h3 className="text-base font-bold mb-3">Samsun'da Gündem</h3>
+          <h3 className="text-base font-bold mb-3">Samsun&apos;da Gündem</h3>
           <div className="flex flex-col gap-3">
             <div>
               <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">

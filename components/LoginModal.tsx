@@ -35,7 +35,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
       <div className="bg-surface-light dark:bg-surface-dark rounded-xl max-w-md w-full p-6">
         {/* Başlık */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Samsun Forum'a Hoş Geldin!</h2>
+          <h2 className="text-2xl font-bold">Samsun Forum&apos;a Hoş Geldin!</h2>
           <button
             onClick={onClose}
             className="text-text-secondary-dark hover:text-text-primary-dark"

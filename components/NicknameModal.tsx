@@ -120,7 +120,7 @@ export default function NicknameModal({ isOpen, firebaseUser, onSuccess }: Nickn
         </form>
 
         <p className="text-xs text-text-secondary-dark text-center mt-4">
-          Nickname'ini daha sonra değiştiremezsin, dikkatli seç!
+          Nickname&apos;ini daha sonra değiştiremezsin, dikkatli seç!
         </p>
       </div>
     </div>

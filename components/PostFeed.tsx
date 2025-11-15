@@ -16,6 +16,7 @@ export default function PostFeed({ sortBy = 'hot' }: PostFeedProps) {
 
   useEffect(() => {
     loadPosts()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy])
 
   const loadPosts = async () => {
