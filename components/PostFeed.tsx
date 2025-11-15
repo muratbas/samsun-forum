@@ -1,55 +1,84 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import PostCard from './PostCard'
+import { getPosts } from '@/lib/posts'
+import { Post } from '@/types'
 
-// Mock data - Firebase'den gerçek veri gelene kadar
-const mockPosts = [
-  {
-    id: '1',
-    title: 'Atakum yakınlarındaki en iyi pideci?',
-    content:
-      'Atakum bölgesindeki en otantik ve lezzetli pide için tavsiye arıyorum. Buraya yeni taşındım ve güzel bir mekan bulmam lazım! Favorileriniz nereler?',
-    imageUrl:
-      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
-    authorNickname: 'samsunlu55',
-    topicName: 'Yemek',
-    topicSlug: 'yemek',
-    upvotes: 1200,
-    downvotes: 0,
-    commentCount: 82,
-    timeAgo: '2 saat önce',
-  },
-  {
-    id: '2',
-    title: "Atatürk Bulvarı'nda yol çalışması",
-    content: 'Dikkat! Bu hafta sonu trafik yoğun olabilir.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=400',
-    authorNickname: 'karadeniz_asigi',
-    topicName: 'Gündem',
-    topicSlug: 'gundem',
-    upvotes: 347,
-    downvotes: 0,
-    commentCount: 45,
-    timeAgo: '5 saat önce',
-  },
-  {
-    id: '3',
-    title: 'CANLI: Samsunspor vs. Adanaspor maçı',
-    content: 'Maç hakkındaki düşünceleriniz neler? Haydi Kırmızı Şimşekler!',
-    authorNickname: 'samsunsporlu',
-    topicName: 'Samsunspor',
-    topicSlug: 'samsunspor',
-    upvotes: 912,
-    downvotes: 0,
-    commentCount: 218,
-    timeAgo: '1 gün önce',
-  },
-]
+interface PostFeedProps {
+  sortBy?: 'new' | 'hot' | 'top'
+}
 
-export default function PostFeed() {
+export default function PostFeed({ sortBy = 'hot' }: PostFeedProps) {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    loadPosts()
+  }, [sortBy])
+
+  const loadPosts = async () => {
+    try {
+      setLoading(true)
+      const fetchedPosts = await getPosts(sortBy)
+      setPosts(fetchedPosts)
+    } catch (err) {
+      console.error('Postları yüklerken hata:', err)
+      setError('Postlar yüklenirken bir hata oluştu')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 animate-pulse"
+          >
+            <div className="h-4 bg-background-dark rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-background-dark rounded w-1/2"></div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6 text-center">
+        <p className="text-primary mb-4">{error}</p>
+        <button
+          onClick={loadPosts}
+          className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90"
+        >
+          Tekrar Dene
+        </button>
+      </div>
+    )
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-8 text-center">
+        <span className="material-symbols-outlined text-6xl text-text-secondary-dark mb-4">
+          forum
+        </span>
+        <h3 className="text-xl font-bold mb-2">Henüz gönderi yok</h3>
+        <p className="text-text-secondary-dark">
+          İlk gönderiyi sen paylaş!
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      {mockPosts.map((post) => (
-        <PostCard key={post.id} {...post} />
+      {posts.map((post) => (
+        <PostCard key={post.id} post={post} />
       ))}
     </div>
   )

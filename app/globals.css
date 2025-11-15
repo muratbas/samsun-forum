@@ -22,6 +22,14 @@
     @apply text-text-primary-light dark:text-text-primary-dark;
     @apply font-display;
   }
+  
+  /* Form elementlerine font uygula */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: var(--font-display), 'Plus Jakarta Sans', sans-serif;
+  }
 }
 
 /* Dark tema için özel scrollbar */

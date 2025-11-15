@@ -20,6 +20,7 @@ export interface Post {
   id: string
   authorId: string
   authorNickname: string
+  authorPhotoURL: string
   title: string
   content?: string
   imageUrl?: string

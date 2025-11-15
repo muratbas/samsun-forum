@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getFirestore, disableNetwork, enableNetwork } from 'firebase/firestore'
+import { getFirestore, enableNetwork } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,11 +20,14 @@ export const db = getFirestore(app)
 
 // Firestore'u kesinlikle online moda zorla (offline cache sorunlarını çözer)
 if (typeof window !== 'undefined') {
-  // Önce disable sonra enable yaparak network'ü reset et
-  disableNetwork(db)
-    .then(() => enableNetwork(db))
+  // Network'ü hemen enable et, offline cache sorununu çöz
+  enableNetwork(db)
+    .then(() => {
+      console.log('Firestore online mode aktif')
+    })
     .catch((error) => {
-      console.error('Firestore network reset hatası:', error)
+      console.warn('Firestore network enable hatası:', error)
+      // Hata olsa bile devam et
     })
 }
 

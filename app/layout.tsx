@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/header'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 // Google Font'u yükle
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -24,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="tr" className="dark">
+    <html lang="tr">
       <head>
         {/* Material Symbols iconlarını yükle */}
         <link
@@ -33,12 +34,14 @@ export default function RootLayout({
         />
       </head>
       <body className={plusJakartaSans.variable}>
-        <AuthProvider>
-          <div className="relative flex min-h-screen w-full flex-col">
-            <Header />
-            {children}
-          </div>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <div className="relative flex min-h-screen w-full flex-col">
+              <Header />
+              {children}
+            </div>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

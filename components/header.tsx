@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { signOut, checkUserExists } from '@/lib/auth'
 import LoginModal from './LoginModal'
 import NicknameModal from './NicknameModal'
@@ -9,6 +10,7 @@ import CreatePostModal from './CreatePostModal'
 
 export default function Header() {
   const { user, firebaseUser, loading, refreshUser } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showNicknameModal, setShowNicknameModal] = useState(false)
   const [showCreatePostModal, setShowCreatePostModal] = useState(false)
@@ -16,15 +18,8 @@ export default function Header() {
 
   // Google login'den sonra nickname kontrolü
   useEffect(() => {
-    console.log('Header useEffect:', { 
-      firebaseUser: firebaseUser?.uid, 
-      user: user?.nickname, 
-      loading 
-    })
-    
     const checkNickname = async () => {
       if (firebaseUser && !user && !loading) {
-        console.log('Nickname modal açılıyor - yeni kullanıcı')
         // Firebase user var ama Firestore'da user yok = yeni kullanıcı
         setShowNicknameModal(true)
       }
@@ -59,7 +54,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 sm:px-6 lg:px-8 py-3">
       {/* Logo ve Marka */}
-      <div className="flex items-center gap-3">
+      <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
         <span className="material-symbols-outlined text-primary text-3xl">
           forum
         </span>
@@ -71,17 +66,17 @@ export default function Header() {
         <h1 className="text-xl font-bold tracking-tight sm:hidden">
           SF
         </h1>
-      </div>
+      </a>
 
       {/* Arama Çubuğu - Sadece tablet+ */}
       <div className="hidden md:flex flex-1 justify-center px-8">
         <label className="flex flex-col w-full max-w-lg h-10">
-          <div className="flex w-full items-stretch rounded-lg h-full">
-            <div className="text-text-secondary-dark flex bg-background-dark items-center justify-center pl-4 rounded-l-lg">
+          <div className="flex w-full items-stretch rounded-lg h-full border border-border-light dark:border-border-dark overflow-hidden">
+            <div className="text-text-secondary-light dark:text-text-secondary-dark flex bg-surface-light dark:bg-surface-dark items-center justify-center pl-4">
               <span className="material-symbols-outlined">search</span>
             </div>
             <input
-              className="form-input flex w-full min-w-0 flex-1 rounded-r-lg text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-background-dark h-full placeholder:text-text-secondary-dark px-4 pl-2 text-base"
+              className="form-input flex w-full min-w-0 flex-1 text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-surface-light dark:bg-surface-dark h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-4 pl-2 text-base"
               placeholder="Samsun'da Ara..."
               type="text"
             />
@@ -103,6 +98,25 @@ export default function Header() {
           className="flex sm:hidden cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-primary text-white hover:bg-primary/90"
         >
           <span className="material-symbols-outlined">add</span>
+        </button>
+
+        {/* Bildirimler Butonu */}
+        <button
+          className="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-transparent text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5"
+          title="Bildirimler"
+        >
+          <span className="material-symbols-outlined">notifications</span>
+        </button>
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-transparent text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5"
+          title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+        >
+          <span className="material-symbols-outlined">
+            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+          </span>
         </button>
 
         {/* Kullanıcı Avatarı veya Giriş Butonu */}

@@ -56,6 +56,7 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
       await createPost(
         user.uid,
         user.nickname,
+        user.photoURL,
         title,
         content,
         topic.id,

@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchUserData = async (firebaseUser: FirebaseUser) => {
+  const fetchUserData = async (firebaseUser: FirebaseUser, retryCount = 0) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
       
@@ -37,7 +37,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null)
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Eğer offline hatası ve retry hakkı varsa, tekrar dene
+      if (error?.code === 'unavailable' && retryCount < 3) {
+        console.log(`Firestore offline, tekrar deneniyor (${retryCount + 1}/3)...`)
+        await new Promise(resolve => setTimeout(resolve, 500))
+        return fetchUserData(firebaseUser, retryCount + 1)
+      }
+      
       console.error('Kullanıcı verisi getirme hatası:', error)
       setUser(null)
     }
