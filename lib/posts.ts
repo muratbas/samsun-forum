@@ -93,7 +93,8 @@ export const getPosts = async (sortBy: 'new' | 'hot' | 'top' = 'hot', limitCount
     const posts: Post[] = []
 
     querySnapshot.forEach((doc) => {
-      posts.push({ id: doc.id, ...doc.data() } as Post)
+      const data = doc.data()
+      posts.push({ id: doc.id, ...data } as Post)
     })
 
     return posts
@@ -118,7 +119,8 @@ export const getPostsByTopic = async (topicId: string, limitCount = 50) => {
     const posts: Post[] = []
 
     querySnapshot.forEach((doc) => {
-      posts.push({ id: doc.id, ...doc.data() } as Post)
+      const data = doc.data()
+      posts.push({ id: doc.id, ...data } as Post)
     })
 
     return posts
@@ -135,7 +137,8 @@ export const getPost = async (postId: string) => {
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as Post
+      const data = docSnap.data()
+      return { id: docSnap.id, ...data } as Post
     } else {
       throw new Error('Post bulunamadı')
     }
