@@ -11,8 +11,7 @@ import {
   orderBy,
   limit,
   serverTimestamp,
-  increment,
-  DocumentData
+  increment
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { Post } from '@/types'
@@ -94,8 +93,7 @@ export const getPosts = async (sortBy: 'new' | 'hot' | 'top' = 'hot', limitCount
     const posts: Post[] = []
 
     querySnapshot.forEach((doc) => {
-      const data = doc.data() as DocumentData
-      posts.push({ id: doc.id, ...data } as Post)
+      posts.push(Object.assign({ id: doc.id }, doc.data()) as Post)
     })
 
     return posts
@@ -120,8 +118,7 @@ export const getPostsByTopic = async (topicId: string, limitCount = 50) => {
     const posts: Post[] = []
 
     querySnapshot.forEach((doc) => {
-      const data = doc.data() as DocumentData
-      posts.push({ id: doc.id, ...data } as Post)
+      posts.push(Object.assign({ id: doc.id }, doc.data()) as Post)
     })
 
     return posts
@@ -138,8 +135,7 @@ export const getPost = async (postId: string) => {
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      const data = docSnap.data() as DocumentData
-      return { id: docSnap.id, ...data } as Post
+      return Object.assign({ id: docSnap.id }, docSnap.data()) as Post
     } else {
       throw new Error('Post bulunamadı')
     }
