@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUserData = async (firebaseUser: FirebaseUser) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+      
       if (userDoc.exists()) {
         setUser(userDoc.data() as User)
       } else {

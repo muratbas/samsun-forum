@@ -1,7 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
+import { getFirestore, disableNetwork, enableNetwork } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,7 +17,16 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 // Servisleri başlat
 export const auth = getAuth(app)
 export const db = getFirestore(app)
-export const storage = getStorage(app)
+
+// Firestore'u kesinlikle online moda zorla (offline cache sorunlarını çözer)
+if (typeof window !== 'undefined') {
+  // Önce disable sonra enable yaparak network'ü reset et
+  disableNetwork(db)
+    .then(() => enableNetwork(db))
+    .catch((error) => {
+      console.error('Firestore network reset hatası:', error)
+    })
+}
 
 export default app
 

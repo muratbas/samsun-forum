@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
-import Header from '@/components/Header'
+import Header from '@/components/header'
 import { AuthProvider } from '@/contexts/AuthContext'
 
 // Google Font'u yükle

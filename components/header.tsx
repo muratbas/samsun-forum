@@ -8,7 +8,7 @@ import NicknameModal from './NicknameModal'
 import CreatePostModal from './CreatePostModal'
 
 export default function Header() {
-  const { user, firebaseUser, loading } = useAuth()
+  const { user, firebaseUser, loading, refreshUser } = useAuth()
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showNicknameModal, setShowNicknameModal] = useState(false)
   const [showCreatePostModal, setShowCreatePostModal] = useState(false)
@@ -16,8 +16,15 @@ export default function Header() {
 
   // Google login'den sonra nickname kontrolü
   useEffect(() => {
+    console.log('Header useEffect:', { 
+      firebaseUser: firebaseUser?.uid, 
+      user: user?.nickname, 
+      loading 
+    })
+    
     const checkNickname = async () => {
       if (firebaseUser && !user && !loading) {
+        console.log('Nickname modal açılıyor - yeni kullanıcı')
         // Firebase user var ama Firestore'da user yok = yeni kullanıcı
         setShowNicknameModal(true)
       }
@@ -36,6 +43,13 @@ export default function Header() {
   const handleLogout = async () => {
     await signOut()
     setShowUserMenu(false)
+  }
+
+  const handleNicknameSuccess = async () => {
+    // Firestore'a yazma işleminin tamamlanması için kısa bir bekleme
+    await new Promise(resolve => setTimeout(resolve, 500))
+    setShowNicknameModal(false)
+    await refreshUser()
   }
 
   const refreshPage = () => {
@@ -147,7 +161,7 @@ export default function Header() {
             displayName: firebaseUser.displayName || '',
             photoURL: firebaseUser.photoURL || '',
           }}
-          onSuccess={refreshPage}
+          onSuccess={handleNicknameSuccess}
         />
       )}
 
