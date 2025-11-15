@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { signOut, checkUserExists } from '@/lib/auth'
@@ -15,13 +15,21 @@ export default function Header() {
   const [showNicknameModal, setShowNicknameModal] = useState(false)
   const [showCreatePostModal, setShowCreatePostModal] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const hasCheckedNickname = useRef(false)
 
   // Google login'den sonra nickname kontrolü
   useEffect(() => {
     const checkNickname = async () => {
-      if (firebaseUser && !user && !loading) {
+      // Loading bitene kadar bekle ve sadece bir kez kontrol et
+      if (!loading && firebaseUser && !user && !hasCheckedNickname.current) {
         // Firebase user var ama Firestore'da user yok = yeni kullanıcı
+        hasCheckedNickname.current = true
         setShowNicknameModal(true)
+      }
+      
+      // Kullanıcı varsa flag'i sıfırla (logout-login döngüsü için)
+      if (user) {
+        hasCheckedNickname.current = false
       }
     }
     checkNickname()

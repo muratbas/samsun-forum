@@ -3,20 +3,13 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { createPost } from '@/lib/posts'
+import { TOPICS, getTopicById } from '@/lib/topics'
 
 interface CreatePostModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
 }
-
-const TOPICS = [
-  { id: 'yemek', name: 'Yemek', slug: 'yemek' },
-  { id: 'etkinlik', name: 'Etkinlik', slug: 'etkinlik' },
-  { id: 'samsunspor', name: 'Samsunspor', slug: 'samsunspor' },
-  { id: 'trafik', name: 'Trafik', slug: 'trafik' },
-  { id: 'gundem', name: 'Gündem', slug: 'gundem' },
-]
 
 export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePostModalProps) {
   const { user } = useAuth()
@@ -51,7 +44,7 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
     setError('')
 
     try {
-      const topic = TOPICS.find(t => t.id === selectedTopic)!
+      const topic = getTopicById(selectedTopic)!
       
       await createPost(
         user.uid,
@@ -94,26 +87,6 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Konu Seçimi */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Konu <span className="text-primary">*</span>
-            </label>
-            <select
-              value={selectedTopic}
-              onChange={(e) => setSelectedTopic(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-primary"
-              disabled={loading}
-            >
-              <option value="">Konu seç...</option>
-              {TOPICS.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  #{topic.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Başlık */}
           <div>
             <label className="block text-sm font-medium mb-2">
@@ -150,6 +123,33 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
             <p className="text-xs text-text-secondary-dark mt-1">
               {content.length}/5000
             </p>
+          </div>
+
+          {/* Konu Seçimi - Liste Formatı */}
+          <div>
+            <label className="block text-sm font-bold mb-3">
+              Konu Seç <span className="text-primary">*</span>
+            </label>
+            <div className="flex flex-col gap-1 max-h-64 overflow-y-auto">
+              {TOPICS.map((topic) => (
+                <button
+                  key={topic.id}
+                  type="button"
+                  onClick={() => setSelectedTopic(topic.id)}
+                  disabled={loading}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
+                    selectedTopic === topic.id
+                      ? 'bg-primary/10 text-primary'
+                      : 'hover:bg-black/5 dark:hover:bg-white/5'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <span className="text-sm font-bold text-primary">#</span>
+                  <span className="text-sm font-bold leading-normal">
+                    {topic.name}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Hata mesajı */}

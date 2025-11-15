@@ -4,13 +4,22 @@ import { useState } from 'react'
 
 type SortType = 'popular' | 'new' | 'top'
 
-export default function SortControls() {
+interface SortControlsProps {
+  onSortChange?: (sort: SortType) => void
+}
+
+export default function SortControls({ onSortChange }: SortControlsProps) {
   const [activeSort, setActiveSort] = useState<SortType>('popular')
+
+  const handleSortClick = (sort: SortType) => {
+    setActiveSort(sort)
+    onSortChange?.(sort)
+  }
 
   return (
     <div className="flex gap-3 p-3 flex-wrap bg-surface-light dark:bg-surface-dark rounded-xl">
       <button
-        onClick={() => setActiveSort('popular')}
+        onClick={() => handleSortClick('popular')}
         className={`flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg px-4 ${
           activeSort === 'popular'
             ? 'bg-primary/20 text-primary'
@@ -26,7 +35,7 @@ export default function SortControls() {
       </button>
 
       <button
-        onClick={() => setActiveSort('new')}
+        onClick={() => handleSortClick('new')}
         className={`flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg px-4 ${
           activeSort === 'new'
             ? 'bg-primary/20 text-primary'
@@ -40,7 +49,7 @@ export default function SortControls() {
       </button>
 
       <button
-        onClick={() => setActiveSort('top')}
+        onClick={() => handleSortClick('top')}
         className={`flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg px-4 ${
           activeSort === 'top'
             ? 'bg-primary/20 text-primary'
