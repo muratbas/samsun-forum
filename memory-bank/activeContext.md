@@ -37,6 +37,8 @@ Proje şu anda **tam fonksiyonel forum platformu** durumunda. Temel ve gelişmi�
 19. **Bug Fix** - Etkinlik oluşturma sırasında tarih/saat state'lerinin undefined olmasından kaynaklanan "Invalid Date" hatası giderildi ve hata mesaj detaylandırması eklendi
 20. **Bug Fix** - Etkinlik işlemlerinde gereksiz veritabanı okumasından kaynaklanan "Insufficient permissions" hatası giderildi
 21. **Feature** - RightSidebar (Sağ Kenar Çubuğu) dinamik hale getirildi; "Bugün Kampüste" ve "Yaklaşan Etkinlikler" kısımleri Firestore'dan gerçek verileri çekiyor
+22. **Feature** - RightSidebar'a "Atatürk'ten Bir Söz" bölümü eklendi; lokal veri, tema uyumlu tasarım ve dinamik imza görseli (dark mode uyumlu) içeriyor
+23. **UI Düzenlemesi** - Atatürk imzası görseli %30 oranında büyütüldü ve opaklığı artırıldı
 
 ## Bilinen Sorunlar
 

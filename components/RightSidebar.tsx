@@ -3,14 +3,17 @@
 import { useState, useEffect } from 'react'
 import { getPinnedPosts } from '@/lib/posts'
 import { getUpcomingEvents } from '@/lib/events'
+import { getRandomQuote } from '@/lib/ataturkQuotes'
 import { Post, Event } from '@/types'
 import Link from 'next/link'
+import Image from 'next/image'
 import { format, isToday } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
 export default function RightSidebar() {
   const [pinnedPosts, setPinnedPosts] = useState<Post[]>([])
   const [events, setEvents] = useState<Event[]>([])
+  const [quote, setQuote] = useState('')
   const [loading, setLoading] = useState(true)
 
   // Mock data - sonra Firebase'den gelecek
@@ -36,6 +39,8 @@ export default function RightSidebar() {
     }
 
     loadData()
+    // Sayfa yüklendiğinde rastgele bir söz seç (Client-side only)
+    setQuote(getRandomQuote())
   }, [])
 
   // Bugünün etkinliğini bul
@@ -165,6 +170,30 @@ export default function RightSidebar() {
               Yakın zamanda etkinlik bulunmuyor.
             </p>
           )}
+        </div>
+      </div>
+
+      {/* Atatürk'ten Söz */}
+      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-5 border border-border-light/60 dark:border-border-dark/60 shadow-sm relative overflow-hidden group">
+        
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="mb-4 opacity-100">
+            <i className="hgi-stroke hgi-quote-down text-2xl text-primary"></i>
+          </div>
+          
+          <p className="font-display font-medium text-sm leading-relaxed mb-6 italic text-text-primary-light dark:text-text-primary-dark">
+            "{quote}"
+          </p>
+          
+          <div className="relative w-40 h-16 mt-auto opacity-100">
+            <Image 
+              src="/images/ataturk-signature.png" 
+              alt="M.K. Atatürk" 
+              fill
+              className="object-contain dark:invert"
+              priority
+            />
+          </div>
         </div>
       </div>
 
