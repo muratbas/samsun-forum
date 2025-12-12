@@ -11,7 +11,7 @@ export default function RightSidebar() {
     <div className="flex flex-col gap-4">
       
       {/* Today on Campus / Bugün Kampüste */}
-      <div className="bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden">
+      <div className="bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-border-light/60 dark:border-border-dark/60">
         <div className="bg-primary px-4 py-3">
           <h3 className="text-white font-bold text-sm">Bugün Kampüste</h3>
         </div>
@@ -44,7 +44,7 @@ export default function RightSidebar() {
       </div>
 
       {/* Trending Topics / Gündemdeki Konular */}
-      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4">
+      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
         <h3 className="font-bold text-sm mb-3">Gündemdeki Konular</h3>
         <div className="flex flex-wrap gap-2">
           {trendingTopics.map((topic, index) => (
@@ -60,7 +60,7 @@ export default function RightSidebar() {
       </div>
 
       {/* Official Announcements / Resmi Duyurular */}
-      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4">
+      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
         <div className="flex items-center gap-2 mb-1">
           <h3 className="font-bold text-sm">Resmi Duyurular</h3>
           <i className="bi bi-pin-angle-fill text-primary"></i>
@@ -79,7 +79,7 @@ export default function RightSidebar() {
       </div>
 
       {/* Yaklaşan Etkinlikler */}
-      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4">
+      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
         <h3 className="font-bold text-sm mb-3">Yaklaşan Etkinlikler</h3>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">

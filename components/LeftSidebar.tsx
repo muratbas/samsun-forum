@@ -5,7 +5,7 @@ export default function LeftSidebar() {
         
         {/* Main Feeds / Ana Akışlar */}
         <div className="mb-4">
-          <h3 className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider px-3 py-2">
+          <h3 className="text-sm font-bold text-text-primary-light dark:text-text-primary-dark px-3 py-2">
             Ana Akışlar
           </h3>
           <nav className="flex flex-col gap-0.5">
@@ -42,7 +42,7 @@ export default function LeftSidebar() {
 
         {/* Academic Hub / Akademik */}
         <div className="mb-4">
-          <h3 className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider px-3 py-2">
+          <h3 className="text-sm font-bold text-text-primary-light dark:text-text-primary-dark px-3 py-2">
             Akademik
           </h3>
           <nav className="flex flex-col gap-0.5">
@@ -65,7 +65,7 @@ export default function LeftSidebar() {
 
         {/* Campus Life / Kampüs Hayatı */}
         <div className="mb-4">
-          <h3 className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider px-3 py-2">
+          <h3 className="text-sm font-bold text-text-primary-light dark:text-text-primary-dark px-3 py-2">
             Kampüs Hayatı
           </h3>
           <nav className="flex flex-col gap-0.5">

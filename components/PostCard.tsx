@@ -105,7 +105,7 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4">
+    <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
       {/* Üst Kısım - Kullanıcı Bilgisi + Üç Nokta */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
