@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { Linkify } from '@/lib/linkify'
 import LeftSidebar from '@/components/LeftSidebar'
+import RightSidebar from '@/components/RightSidebar'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -167,13 +168,20 @@ export default function PostDetailPage() {
       <div className="flex min-h-screen">
         <LeftSidebar />
         <main className="flex-1 lg:ml-64">
-          <div className="max-w-3xl mx-auto px-4 py-6">
-            <div className="animate-pulse">
-              <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6">
-                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
-                <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
-                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex gap-6">
+              <div className="flex-1 min-w-0">
+                <div className="animate-pulse">
+                  <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6">
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+                    <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="hidden lg:block w-80 flex-shrink-0">
+                <RightSidebar />
               </div>
             </div>
           </div>
@@ -187,11 +195,18 @@ export default function PostDetailPage() {
       <div className="flex min-h-screen">
         <LeftSidebar />
         <main className="flex-1 lg:ml-64">
-          <div className="max-w-3xl mx-auto px-4 py-6">
-            <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6 text-center">
-              <p className="text-text-secondary-light dark:text-text-secondary-dark">
-                Gönderi bulunamadı
-              </p>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex gap-6">
+              <div className="flex-1 min-w-0">
+                <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6 text-center">
+                  <p className="text-text-secondary-light dark:text-text-secondary-dark">
+                    Gönderi bulunamadı
+                  </p>
+                </div>
+              </div>
+              <div className="hidden lg:block w-80 flex-shrink-0">
+                <RightSidebar />
+              </div>
             </div>
           </div>
         </main>
@@ -208,7 +223,10 @@ export default function PostDetailPage() {
       <LeftSidebar />
       
       <main className="flex-1 lg:ml-64">
-        <div className="max-w-3xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex gap-6">
+            {/* Sol - Post ve Yorumlar */}
+            <div className="flex-1 min-w-0">
           
           {/* Post Detay */}
           <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-border-light/60 dark:border-border-dark/60 mb-4">
@@ -355,6 +373,13 @@ export default function PostDetailPage() {
                 ))}
               </div>
             )}
+          </div>
+            </div>
+
+            {/* Sağ Sidebar */}
+            <div className="hidden lg:block w-80 flex-shrink-0">
+              <RightSidebar />
+            </div>
           </div>
         </div>
       </main>
