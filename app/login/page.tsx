@@ -9,11 +9,13 @@ import Image from 'next/image'
 export default function LoginPage() {
   const router = useRouter()
   const { user, loading } = useAuth()
-  const [emailOrNickname, setEmailOrNickname] = useState('') // Değişken adı daha açıklayıcı olsun
+  const [emailOrNickname, setEmailOrNickname] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
+  // (useEffect ... aynen)
   // Kullanıcı zaten giriş yapmışsa anasayfaya yönlendir
   useEffect(() => {
     if (!loading && user) {
@@ -21,6 +23,7 @@ export default function LoginPage() {
     }
   }, [user, loading, router])
 
+  // (handleGoogleLogin ... aynen)
   const handleGoogleLogin = async () => {
     try {
       setError('')
@@ -32,6 +35,7 @@ export default function LoginPage() {
     }
   }
 
+  // (handleFormLogin ... aynen)
   const handleFormLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -77,17 +81,17 @@ export default function LoginPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    )
-  }
+     return (
+       <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
+         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+       </div>
+     )
+   }
 
   return (
     <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white font-display">
       
-      {/* Header / Nav - Bu sayfanın özel header'ı */}
+      {/* Header / Nav - Sadece Logo */}
       <header className="w-full flex items-center justify-between border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-6 py-4 md:px-10 z-10">
         <div 
           onClick={() => router.push('/')}
@@ -106,17 +110,7 @@ export default function LoginPage() {
           </h2>
         </div>
         
-        <div className="flex gap-4 items-center">
-          <span className="hidden sm:block text-sm text-text-secondary-light dark:text-gray-400">
-            Üye değil misin?
-          </span>
-          <button 
-            onClick={() => router.push('/register')}
-            className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-bold leading-normal tracking-[0.015em] transition-colors"
-          >
-            <span className="truncate">Kayıt Ol</span>
-          </button>
-        </div>
+        {/* Sağ taraf temizlendi */}
       </header>
 
       {/* Main Content */}
@@ -173,16 +167,24 @@ export default function LoginPage() {
                   <input 
                     className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary-light dark:text-white dark:bg-[#1a2632] border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-12 px-4 pr-12 text-base font-normal placeholder:text-[#93a2b1] transition-all" 
                     placeholder="Şifrenizi girin" 
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  <button className="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center text-text-secondary-light hover:text-text-primary-light dark:hover:text-white transition-colors cursor-pointer" type="button">
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>visibility</span>
+                  <button 
+                    className="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center text-text-secondary-light hover:text-text-primary-light dark:hover:text-white transition-colors cursor-pointer" 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                      {showPassword ? 'visibility_off' : 'visibility'}
+                    </span>
                   </button>
                 </div>
               </label>
-
+              
+              {/* Button, Divider, Social ... (kalan kısım aynen) */}
+              
               {/* Submit Button */}
               <button 
                 className={`flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 bg-primary hover:bg-blue-600 text-white text-base font-bold leading-normal tracking-[0.015em] transition-colors mt-2 shadow-sm shadow-blue-500/20 ${isSubmitting ? 'opacity-70 cursor-wait' : ''}`} 

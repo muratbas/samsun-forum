@@ -15,6 +15,7 @@ export default function RegisterPage() {
   const [nickname, setNickname] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   // Kullanıcı zaten giriş yapmışsa anasayfaya yönlendir
   useEffect(() => {
@@ -111,7 +112,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white font-display">
       
-      {/* Header / Nav */}
+      {/* Header / Nav - Sadece Logo */}
       <header className="w-full flex items-center justify-between border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-6 py-4 md:px-10 z-10">
         <div 
           onClick={() => router.push('/')}
@@ -130,17 +131,7 @@ export default function RegisterPage() {
           </h2>
         </div>
         
-        <div className="flex gap-4 items-center">
-          <span className="hidden sm:block text-sm text-text-secondary-light dark:text-gray-400">
-            Zaten üye misin?
-          </span>
-          <button 
-            onClick={() => router.push('/login')}
-            className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-bold leading-normal tracking-[0.015em] transition-colors"
-          >
-            <span className="truncate">Giriş Yap</span>
-          </button>
-        </div>
+        {/* Sağ taraf boş */}
       </header>
 
       {/* Main Content */}
@@ -156,7 +147,7 @@ export default function RegisterPage() {
                 Hesap Oluştur
               </h1>
               <p className="text-text-secondary-light dark:text-gray-400 text-base font-normal">
-                OMÜ topluluğunun bir parçası ol. Kayıt olmak ücretsizdir.
+                OMÜ topluluğunun bir parçası ol.
               </p>
             </div>
 
@@ -184,7 +175,7 @@ export default function RegisterPage() {
                 />
               </label>
 
-              {/* Nickname (Yeni) */}
+              {/* Nickname */}
               <label className="flex flex-col gap-2">
                 <span className="text-text-primary-light dark:text-gray-200 text-sm font-medium leading-normal">
                   Kullanıcı Adı (Nickname)
@@ -230,13 +221,19 @@ export default function RegisterPage() {
                   <input 
                     className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary-light dark:text-white dark:bg-[#1a2632] border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-12 px-4 pr-12 text-base font-normal placeholder:text-[#93a2b1] transition-all" 
                     placeholder="Güçlü bir şifre oluşturun" 
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
-                  <button className="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center text-text-secondary-light hover:text-text-primary-light dark:hover:text-white transition-colors cursor-pointer" type="button">
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>visibility</span>
+                  <button 
+                    className="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center text-text-secondary-light hover:text-text-primary-light dark:hover:text-white transition-colors cursor-pointer" 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                      {showPassword ? 'visibility_off' : 'visibility'}
+                    </span>
                   </button>
                 </div>
                 <p className="text-xs text-text-secondary-light dark:text-gray-500">
