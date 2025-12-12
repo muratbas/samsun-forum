@@ -40,7 +40,7 @@ export default function SortControls({ onSortChange }: SortControlsProps) {
             : 'hover:bg-black/5 dark:hover:bg-white/5'
         }`}
       >
-        <span className="material-symbols-outlined text-base">local_fire_department</span>
+        <i className="hgi-stroke hgi-fire text-base"></i>
         <p className={`text-sm ${activeSort === 'new' ? 'font-bold' : 'font-medium'} leading-normal`}>
           Yeni
         </p>

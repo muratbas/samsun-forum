@@ -47,10 +47,19 @@ export default function RightSidebar() {
     setQuote(getRandomQuote())
   }, [])
 
-  // Bugünün etkinliğini bul
-  const todayEvent = events.find(event => isToday(event.date.toDate()))
+  // Bugünün etkinliğini bul (Saati geçmişse gösterme, sıradakini göster)
+  const now = new Date()
   
-  // Yaklaşan etkinlikler (Bugünün etkinliğini listeden çıkarıp ilk 3'ünü al)
+  // Bugüne ait ve saati henüz geçmemiş etkinlikleri bul
+  const todaysUpcomingEvents = events.filter(event => {
+    const eventDate = event.date.toDate()
+    return isToday(eventDate) && eventDate > now
+  })
+  
+  // En yakın olanı seç
+  const todayEvent = todaysUpcomingEvents[0]
+  
+  // Yaklaşan etkinlikler (Bugünün dışındakiler)
   const upcomingEvents = events
     .filter(event => !isToday(event.date.toDate()))
     .slice(0, 3)
