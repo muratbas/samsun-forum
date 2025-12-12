@@ -1,145 +1,26 @@
-# OMÜForum - Aktif Bağlam
+# Active Context
 
-## Mevcut Odak
+## Current Focus
 
-Proje şu anda **tam fonksiyonel forum platformu** durumunda. Temel ve gelişmiş forum işlevleri çalışıyor:
+Entegrasyon ve UI iyileştirmeleri tamamlandı.
 
-- ✅ Giriş/Kayıt
-- ✅ Post oluşturma ve silme
-- ✅ Post detay sayfası
-- ✅ Yorum sistemi
-- ✅ Oylama
-- ✅ Admin sistemi ve post sabitleme
-- ✅ Etiket sistemi
+- **Login/Register:** `/login` ve `/register` sayfaları tam fonksiyonel (Google + Email/Pass).
+- **Header:** Gizlendi.
+- **Weather:** Aktif.
+- **Sorting:** Aktif.
 
-## Son Yapılan Değişiklikler
+## Recent Changes
 
-### En Son Tamamlananlar (Son Güncelleme)
+31. **Feature** - `/login` ve `/register` sayfaları eklendi. Google Auth ve Email/Password Auth entegrasyonu tamamlandı.
+32. **Feature** - Register sayfasında Nickname seçimi ve Firestore kaydı entegre edildi.
+33. **Refactor** - `lib/auth.ts` içine email/pass fonksiyonları eklendi.
 
-1. **Post Sabitleme Sistemi** - Admin'ler post'ları resmi duyuru olarak sabitleyebiliyor
-2. **RightSidebar Güncellemesi** - Sabitlenmiş postlar "Resmi Duyurular" bölümünde gösteriliyor
-3. **Post Detay Sayfası Pin/Unpin** - Post detay sayfasında admin'ler sabitleme yapabiliyor
-4. **CreatePostModal İyileştirmeleri** - Etiket sistemi baloncuk formatına dönüştürüldü, admin için pin toggle eklendi
-5. **Icon Set Değişikliği** - Hugeicons CDN entegrasyonu, tüm iconlar güncellendi
-6. **Custom Font** - SF Pro Display font entegrasyonu
-7. **Post Silme** - Kullanıcılar kendi postlarını silebiliyor, admin'ler her postu silebiliyor
-8. **ConfirmModal** - Özel onay modal'ı eklendi (sitestyle uyumlu)
-9. **Admin Badge** - Admin kullanıcılar için görsel badge eklendi
-10. **Post Detay Sayfası** - Tam post görünümü, yorum yapma ve listeleme
-11. **UI Güncellemesi** - RightSidebar'daki sabitleme yazısı kaldırıldı
-12. **Icon Güncellemesi** - Popüler butonu yıldız ikonu, Yeni butonu alev ikonu olarak güncellendi
-13. **LeftSidebar Düzenlemesi** - Ana Akışlar menüsünden Popüler, Taze ve Aboneliklerim kaldırıldı
-14. **Bug Fix** - CreatePostModal'daki toggle switch renk ve pozisyon hatası düzeltildi
-15. **Yeni Sayfa** - Etkinlik Takvimi sayfası (`/etkinlikler`) oluşturuldu ve backend ile bağlandı (dinamik veri)
-16. **UI İyileştirmesi** - Etkinlikler sayfasındaki takvim ve sidebar tamamen Türkçeleştirildi, mini takvim eklendi
-17. **UI Düzenlemesi** - Takvim hücre boyutu küçültülerek daha kompakt görünüm sağlandı
-18. **UX İyileştirmesi** - Etkinlik ekleme modalında native date/time inputlar yerine Türkçe (GG/Ay/YYYY) ve 24 saat formatını garanti eden özel select bileşenleri kullanıldı
-19. **Bug Fix** - Etkinlik oluşturma sırasında tarih/saat state'lerinin undefined olmasından kaynaklanan "Invalid Date" hatası giderildi ve hata mesaj detaylandırması eklendi
-20. **Bug Fix** - Etkinlik işlemlerinde gereksiz veritabanı okumasından kaynaklanan "Insufficient permissions" hatası giderildi
-21. **Feature** - RightSidebar (Sağ Kenar Çubuğu) dinamik hale getirildi; "Bugün Kampüste" ve "Yaklaşan Etkinlikler" kısımleri Firestore'dan gerçek verileri çekiyor
-22. **Feature** - RightSidebar'a "Atatürk'ten Bir Söz" bölümü eklendi; lokal veri, tema uyumlu tasarım ve dinamik imza görseli (dark mode uyumlu) içeriyor
-23. **UI Düzenlemesi** - Atatürk imzası görseli %30 oranında büyütüldü ve opaklığı artırıldı
+## Active Decisions
 
-## Bilinen Sorunlar
+- **Auth Flow:** Google Login -> Nickname Modal (Header). Email Register -> Formda Nickname -> Direkt Giriş.
+- **Sorting:** "Popular" client-side sort ediliyor (Firestore limitasyonu).
 
-- **Firestore İzin Hatası:** `events` koleksiyonu için Security Rules tanımlı olmadığı için "Insufficient permissions" hatası alınıyor. Kullanıcının manuel eklemesi gerekiyor.
+## Next Steps
 
-### Öncelikli
-
-- [ ] Firestore index'leri bazı sorgular için gerekebilir (composite queries)
-- [ ] Image upload henüz aktif değil
-- [ ] Post düzenleme özelliği yok
-
-### Düşük Öncelikli
-
-- [ ] Arama fonksiyonu yok
-- [ ] User profil sayfası yok
-- [ ] Bildirimler sistemi yok
-
-## Aktif Kararlar
-
-### Tema Varsayılanı
-
-Dark mode varsayılan olarak ayarlandı. Kullanıcı tercihi localStorage'da saklanıyor.
-
-### Nickname Değiştirme
-
-Şu an nickname bir kez seçildikten sonra değiştirilemiyor. Bu kasıtlı bir karar - spam ve kötüye kullanımı önlemek için.
-
-### Soft Delete
-
-Post'lar silindiğinde `deleted: true` olarak işaretleniyor, gerçekten silinmiyor. Bu sayede moderasyon ve geri alma mümkün.
-
-### Post Sabitleme
-
-- Sadece admin'ler post sabitleyebilir
-- Sabitlenmiş postlar RightSidebar'da "Resmi Duyurular" bölümünde gösteriliyor
-- Maksimum 3 sabitlenmiş post gösteriliyor
-- Admin hem üç nokta menüsünden hem de yeni gönderi oluştururken sabitleyebilir
-
-### Etiket Sistemi
-
-- Etiket seçimi opsiyonel
-- Baloncuk formatında gösteriliyor
-- Seçili etiket kırmızı arka planlı
-- Tekrar tıklayınca seçim kaldırılabiliyor
-
-## Sonraki Adımlar
-
-### Kısa Vadeli (Öncelikli)
-
-1. **Post Düzenleme** - Kullanıcılar kendi postlarını düzenleyebilmeli
-2. **Image Upload** - Firebase Storage ile resim yükleme
-3. **User Profil Sayfası** - `/user/[nickname]` route
-
-### Orta Vadeli
-
-1. Topic filtreleme sayfası (`/topic/[slug]`)
-2. Firestore security rules güncellemesi
-3. Bildirimler sistemi
-
-### Uzun Vadeli
-
-1. Moderasyon araçları geliştirme
-2. Events section (API entegrasyonu)
-3. Arama fonksiyonu
-4. Nested comments (reply sistemi)
-
-## Önemli Dosyalar
-
-### Sık Düzenlenen
-
-- `components/PostCard.tsx` - Post kartı, oylama, silme, sabitleme
-- `components/CreatePostModal.tsx` - Yeni gönderi oluşturma, etiket seçimi, pin toggle
-- `app/post/[id]/page.tsx` - Post detay sayfası, yorumlar, sabitleme
-- `components/RightSidebar.tsx` - Sabitlenmiş postlar gösterimi
-- `lib/posts.ts` - Post CRUD, pin/unpin işlemleri
-- `lib/comments.ts` - Yorum CRUD işlemleri
-
-### Dikkat Edilmesi Gerekenler
-
-- `lib/firebase.ts` - Firebase config (env variables gerekli)
-- `contexts/AuthContext.tsx` - Auth state yönetimi
-- `types/index.ts` - TypeScript tanımları (Post, Comment, User)
-
-## Geliştirme Notları
-
-### Test İçin
-
-Firebase console'dan test kullanıcısı ve post'ları oluşturabilirsin. Firestore'daki collection'lar:
-
-- `users` - Kullanıcılar (role: 'admin' ile admin yapılabilir)
-- `posts` - Gönderiler (pinned: true ile sabitlenebilir)
-- `comments` - Yorumlar
-- `votes` - Oylar
-
-### Debugging
-
-- Browser console'da Firebase hataları görülebilir
-- Network tab'da Firestore istekleri izlenebilir
-- AuthContext'teki `loading` state'i kontrol edilebilir
-- Post detay sayfasında console.log'lar var (debug için)
-
-### Admin Yapma
-
-Firebase Console > Firestore > `users` collection'ında ilgili kullanıcının `role` alanını `"admin"` olarak değiştir.
+- Production Deploy.
+- Test kullanıcıları ile deneme.

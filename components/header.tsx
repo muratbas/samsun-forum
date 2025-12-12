@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { signOut, checkUserExists } from '@/lib/auth'
@@ -17,36 +18,50 @@ export default function Header() {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const hasCheckedNickname = useRef(false)
+  
+  const pathname = usePathname()
+  const router = useRouter()
 
   // Google login'den sonra nickname kontrolü
   useEffect(() => {
-    const checkNickname = async () => {
-      // Loading bitene kadar bekle ve sadece bir kez kontrol et
-      if (!loading && firebaseUser && !user && !hasCheckedNickname.current) {
-        // Firebase user var ama Firestore'da user yok = yeni kullanıcı
-        hasCheckedNickname.current = true
-        setShowNicknameModal(true)
+    // Race condition önlemek için kısa bir gecikme
+    const timer = setTimeout(() => {
+      const checkNickname = async () => {
+        // Loading bitene kadar bekle ve sadece bir kez kontrol et
+        if (!loading && firebaseUser && !user && !hasCheckedNickname.current) {
+          // Firebase user var ama Firestore'da user yok = yeni kullanıcı
+          hasCheckedNickname.current = true
+          setShowNicknameModal(true)
+        }
+        
+        // Kullanıcı varsa flag'i sıfırla (logout-login döngüsü için)
+        if (user) {
+          hasCheckedNickname.current = false
+          // Eğer modal açıksa ve user geldiyse kapat
+          setShowNicknameModal(false)
+        }
       }
-      
-      // Kullanıcı varsa flag'i sıfırla (logout-login döngüsü için)
-      if (user) {
-        hasCheckedNickname.current = false
-      }
-    }
-    checkNickname()
+      checkNickname()
+    }, 1000)
+
+    return () => clearTimeout(timer)
   }, [firebaseUser, user, loading])
+
+  // Login (veya Register) sayfasında header'ı gizle
+  if (pathname === '/login' || pathname === '/register') return null
 
   const handleLoginClick = () => {
     if (user) {
       setShowCreatePostModal(true)
     } else {
-      setShowLoginModal(true)
+      router.push('/login')
     }
   }
 
   const handleLogout = async () => {
     await signOut()
     setShowUserMenu(false)
+    router.refresh()
   }
 
   const handleNicknameSuccess = async () => {
@@ -168,7 +183,7 @@ export default function Header() {
           </div>
         ) : (
           <button
-            onClick={() => setShowLoginModal(true)}
+            onClick={() => router.push('/login')}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary/90"
           >
             <span className="material-symbols-outlined text-sm">login</span>

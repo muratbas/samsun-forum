@@ -3,7 +3,9 @@ import {
   GoogleAuthProvider, 
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  User as FirebaseUser 
+  User as FirebaseUser,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 } from 'firebase/auth'
 import { 
   doc, 
@@ -11,7 +13,9 @@ import {
   setDoc, 
   getDocs,
   collection,
-  serverTimestamp 
+  serverTimestamp,
+  query,
+  where
 } from 'firebase/firestore'
 import { auth, db } from './firebase'
 
@@ -27,6 +31,28 @@ export const signInWithGoogle = async () => {
     return result.user
   } catch (error) {
     console.error('Google ile giriş hatası:', error)
+    throw error
+  }
+}
+
+// Email ile Kayıt Ol
+export const signUpWithEmail = async (email: string, password: string) => {
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password)
+    return result.user
+  } catch (error) {
+    console.error('Email kayıt hatası:', error)
+    throw error
+  }
+}
+
+// Email ile Giriş Yap
+export const signInWithEmail = async (email: string, password: string) => {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password)
+    return result.user
+  } catch (error) {
+    console.error('Email giriş hatası:', error)
     throw error
   }
 }
@@ -52,7 +78,7 @@ export const checkUserExists = async (uid: string) => {
   }
 }
 
-// Yeni kullanıcı oluştur
+// Yeni kullanıcı oluştur (Firestore)
 export const createUser = async (
   uid: string, 
   email: string, 
@@ -95,8 +121,26 @@ export const checkNicknameAvailable = async (nickname: string) => {
   }
 }
 
+// Nickname'den Email bul (Giriş için)
+export const getUserEmailByNickname = async (nickname: string) => {
+  try {
+    const q = query(collection(db, 'users'), where('nickname', '==', nickname))
+    const querySnapshot = await getDocs(q)
+    
+    if (querySnapshot.empty) {
+      return null
+    }
+    
+    // İlk eşleşen dokümanın emailini dön
+    const userData = querySnapshot.docs[0].data()
+    return userData.email as string
+  } catch (error) {
+    console.error('Nickname email sorgusu hatası:', error)
+    return null
+  }
+}
+
 // Auth state değişimini dinle
 export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
   return onAuthStateChanged(auth, callback)
 }
-
