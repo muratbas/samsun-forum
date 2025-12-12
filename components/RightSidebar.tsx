@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { getPinnedPosts } from '@/lib/posts'
 import { getUpcomingEvents } from '@/lib/events'
 import { getRandomQuote } from '@/lib/ataturkQuotes'
+import { getCurrentWeather, WeatherData } from '@/lib/weather'
 import { Post, Event } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -13,6 +14,7 @@ import { tr } from 'date-fns/locale'
 export default function RightSidebar() {
   const [pinnedPosts, setPinnedPosts] = useState<Post[]>([])
   const [events, setEvents] = useState<Event[]>([])
+  const [weather, setWeather] = useState<WeatherData | null>(null)
   const [quote, setQuote] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -25,12 +27,14 @@ export default function RightSidebar() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [postsData, eventsData] = await Promise.all([
+        const [postsData, eventsData, weatherData] = await Promise.all([
           getPinnedPosts(3),
-          getUpcomingEvents(5) // Bugün + 4 gelecek etkinlik çekelim
+          getUpcomingEvents(5), // Bugün + 4 gelecek etkinlik çekelim
+          getCurrentWeather()
         ])
         setPinnedPosts(postsData)
         setEvents(eventsData)
+        setWeather(weatherData)
       } catch (error) {
         console.error('Veriler yüklenemedi:', error)
       } finally {
@@ -62,13 +66,24 @@ export default function RightSidebar() {
         <div className="p-4">
           {/* Hava Durumu */}
           <div className="flex items-center gap-3 mb-4">
-            <i className="bi bi-cloud-sun-fill text-3xl text-yellow-500"></i>
-            <div>
-              <p className="font-bold">Hava Durumu</p>
-              <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                18°C / Güneşli
-              </p>
-            </div>
+            {weather ? (
+              <>
+                <i className={`bi ${weather.icon} text-3xl ${weather.color}`}></i>
+                <div>
+                  <p className="font-bold">Kampüs</p>
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                    {weather.temperature}°C / {weather.condition}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <i className="bi bi-cloud-sun-fill text-3xl text-gray-300 dark:text-gray-600 animate-pulse"></i>
+                <div>
+                  <p className="font-bold text-gray-400">Yükleniyor...</p>
+                </div>
+              </>
+            )}
           </div>
           
           {/* Öne Çıkan Etkinlik (Bugünün Etkinliği) */}

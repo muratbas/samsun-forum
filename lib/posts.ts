@@ -70,11 +70,12 @@ export const createPost = async (
 }
 
 // Tüm postları getir (sıralama ile)
-export const getPosts = async (sortBy: 'new' | 'hot' | 'top' = 'hot', limitCount = 50) => {
+export const getPosts = async (sortBy: 'new' | 'popular' | 'top' = 'popular', limitCount = 50) => {
   try {
     let q
     
     if (sortBy === 'new') {
+      // En son atılanlar
       q = query(
         collection(db, 'posts'),
         where('deleted', '==', false),
@@ -82,6 +83,7 @@ export const getPosts = async (sortBy: 'new' | 'hot' | 'top' = 'hot', limitCount
         limit(limitCount)
       )
     } else if (sortBy === 'top') {
+      // En çok puan alanlar (Tüm zamanlar)
       q = query(
         collection(db, 'posts'),
         where('deleted', '==', false),
@@ -89,11 +91,18 @@ export const getPosts = async (sortBy: 'new' | 'hot' | 'top' = 'hot', limitCount
         limit(limitCount)
       )
     } else {
-      // hot: sadece score'a göre sırala (index gerekmez)
+      // Popular: Son 24 saat içinde atılanlar
+      // Firestore'da 'createdAt >= X' ve 'orderBy score' birlikte kullanılamaz (Composite Index kısıtı olmadan zordur).
+      // Bu yüzden son 24 saati çekip client-side sıralayacağız.
+      
+      const oneDayAgo = new Date()
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1)
+
       q = query(
         collection(db, 'posts'),
         where('deleted', '==', false),
-        orderBy('score', 'desc'),
+        where('createdAt', '>=', oneDayAgo),
+        orderBy('createdAt', 'desc'), // Önce tarihe göre mecbur
         limit(limitCount)
       )
     }
@@ -104,6 +113,11 @@ export const getPosts = async (sortBy: 'new' | 'hot' | 'top' = 'hot', limitCount
     querySnapshot.forEach((doc) => {
       posts.push(Object.assign({ id: doc.id }, doc.data()) as Post)
     })
+
+    // Eğer Popular (Son 24 saat) ise puana göre sırala
+    if (sortBy === 'popular') {
+      posts.sort((a, b) => b.score - a.score)
+    }
 
     return posts
   } catch (error) {

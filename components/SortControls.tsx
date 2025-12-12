@@ -54,9 +54,9 @@ export default function SortControls({ onSortChange }: SortControlsProps) {
             : 'hover:bg-black/5 dark:hover:bg-white/5'
         }`}
       >
-        <span className="material-symbols-outlined text-base">arrow_upward</span>
+        <i className="hgi-stroke hgi-thumbs-up text-base"></i>
         <p className={`text-sm ${activeSort === 'top' ? 'font-bold' : 'font-medium'} leading-normal`}>
-          En Çok Oylanan
+          En Beğenilen
         </p>
       </button>
     </div>

@@ -6,10 +6,10 @@ import { getPosts } from '@/lib/posts'
 import { Post } from '@/types'
 
 interface PostFeedProps {
-  sortBy?: 'new' | 'hot' | 'top'
+  sortBy?: 'new' | 'popular' | 'top'
 }
 
-export default function PostFeed({ sortBy = 'hot' }: PostFeedProps) {
+export default function PostFeed({ sortBy = 'popular' }: PostFeedProps) {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -92,4 +92,3 @@ export default function PostFeed({ sortBy = 'hot' }: PostFeedProps) {
     </div>
   )
 }
-
