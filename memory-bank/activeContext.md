@@ -30,9 +30,17 @@ Proje şu anda **tam fonksiyonel forum platformu** durumunda. Temel ve gelişmi�
 12. **Icon Güncellemesi** - Popüler butonu yıldız ikonu, Yeni butonu alev ikonu olarak güncellendi
 13. **LeftSidebar Düzenlemesi** - Ana Akışlar menüsünden Popüler, Taze ve Aboneliklerim kaldırıldı
 14. **Bug Fix** - CreatePostModal'daki toggle switch renk ve pozisyon hatası düzeltildi
-15. **Yeni Sayfa** - Etkinlik Takvimi sayfası (`/etkinlikler`) oluşturuldu (statik mockup olarak)
+15. **Yeni Sayfa** - Etkinlik Takvimi sayfası (`/etkinlikler`) oluşturuldu ve backend ile bağlandı (dinamik veri)
+16. **UI İyileştirmesi** - Etkinlikler sayfasındaki takvim ve sidebar tamamen Türkçeleştirildi, mini takvim eklendi
+17. **UI Düzenlemesi** - Takvim hücre boyutu küçültülerek daha kompakt görünüm sağlandı
+18. **UX İyileştirmesi** - Etkinlik ekleme modalında native date/time inputlar yerine Türkçe (GG/Ay/YYYY) ve 24 saat formatını garanti eden özel select bileşenleri kullanıldı
+19. **Bug Fix** - Etkinlik oluşturma sırasında tarih/saat state'lerinin undefined olmasından kaynaklanan "Invalid Date" hatası giderildi ve hata mesaj detaylandırması eklendi
+20. **Bug Fix** - Etkinlik işlemlerinde gereksiz veritabanı okumasından kaynaklanan "Insufficient permissions" hatası giderildi
+21. **Feature** - RightSidebar (Sağ Kenar Çubuğu) dinamik hale getirildi; "Bugün Kampüste" ve "Yaklaşan Etkinlikler" kısımleri Firestore'dan gerçek verileri çekiyor
 
 ## Bilinen Sorunlar
+
+- **Firestore İzin Hatası:** `events` koleksiyonu için Security Rules tanımlı olmadığı için "Insufficient permissions" hatası alınıyor. Kullanıcının manuel eklemesi gerekiyor.
 
 ### Öncelikli
 

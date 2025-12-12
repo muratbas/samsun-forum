@@ -81,8 +81,11 @@ export interface Event {
   description: string
   location: string
   date: Timestamp
+  category: string
   imageUrl?: string
-  source: string
+  source?: string
   externalUrl?: string
+  createdBy: string
+  createdAt: Timestamp
 }
 

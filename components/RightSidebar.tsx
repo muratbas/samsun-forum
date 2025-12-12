@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { getPinnedPosts } from '@/lib/posts'
-import { Post } from '@/types'
+import { getUpcomingEvents } from '@/lib/events'
+import { Post, Event } from '@/types'
 import Link from 'next/link'
+import { format, isToday } from 'date-fns'
+import { tr } from 'date-fns/locale'
 
 export default function RightSidebar() {
   const [pinnedPosts, setPinnedPosts] = useState<Post[]>([])
+  const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
 
   // Mock data - sonra Firebase'den gelecek
@@ -16,19 +20,31 @@ export default function RightSidebar() {
   ]
 
   useEffect(() => {
-    const loadPinnedPosts = async () => {
+    const loadData = async () => {
       try {
-        const posts = await getPinnedPosts(3)
-        setPinnedPosts(posts)
+        const [postsData, eventsData] = await Promise.all([
+          getPinnedPosts(3),
+          getUpcomingEvents(5) // Bugün + 4 gelecek etkinlik çekelim
+        ])
+        setPinnedPosts(postsData)
+        setEvents(eventsData)
       } catch (error) {
-        console.error('Sabitlenmiş postlar yüklenemedi:', error)
+        console.error('Veriler yüklenemedi:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    loadPinnedPosts()
+    loadData()
   }, [])
+
+  // Bugünün etkinliğini bul
+  const todayEvent = events.find(event => isToday(event.date.toDate()))
+  
+  // Yaklaşan etkinlikler (Bugünün etkinliğini listeden çıkarıp ilk 3'ünü al)
+  const upcomingEvents = events
+    .filter(event => !isToday(event.date.toDate()))
+    .slice(0, 3)
 
   return (
     <div className="flex flex-col gap-4">
@@ -50,118 +66,105 @@ export default function RightSidebar() {
             </div>
           </div>
           
-          {/* Öne Çıkan Etkinlik */}
+          {/* Öne Çıkan Etkinlik (Bugünün Etkinliği) */}
           <div className="flex items-start gap-3 pt-3 border-t border-border-light dark:border-border-dark">
             <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
               <i className="bi bi-calendar-event text-xl text-primary"></i>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mb-0.5">Öne Çıkan Etkinlik</p>
-              <p className="font-semibold text-sm truncate">Kariyer Günleri 2025</p>
-              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                Bugün · 14:00
-              </p>
+              {todayEvent ? (
+                <>
+                  <p className="font-semibold text-sm truncate" title={todayEvent.title}>{todayEvent.title}</p>
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">
+                    {format(todayEvent.date.toDate(), 'HH:mm')} • {todayEvent.location}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">
+                  Bugün planlanmış etkinlik yok.
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Trending Topics / Gündemdeki Konular */}
+      {/* Trending Topics / Gündem */}
       <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
-        <h3 className="font-bold text-sm mb-3">Gündemdeki Konular</h3>
+        <h3 className="font-bold text-sm mb-3">Gündem Başlıkları</h3>
         <div className="flex flex-wrap gap-2">
           {trendingTopics.map((topic, index) => (
-            <a
-              key={index}
-              href={`/search?q=${encodeURIComponent(topic)}`}
-              className="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold rounded-full transition-colors"
+            <Link 
+              key={index} 
+              href={`/topic/${topic.replace('#', '')}`}
+              className="text-xs font-medium px-3 py-1.5 bg-background-light dark:bg-white/5 rounded-full text-text-secondary-light dark:text-text-secondary-dark hover:bg-primary/10 hover:text-primary transition-colors"
             >
               {topic}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
 
       {/* Official Announcements / Resmi Duyurular */}
-      <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className="font-bold text-sm">Resmi Duyurular</h3>
-          <i className="hgi-stroke hgi-pin text-primary"></i>
-        </div>
-
-        
-        {loading ? (
-          <div className="space-y-2">
-            <div className="h-16 bg-background-dark/50 rounded-lg animate-pulse"></div>
+      {pinnedPosts.length > 0 && (
+        <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
+          <div className="flex items-center gap-2 mb-3">
+            <i className="hgi-stroke hgi-pin text-primary"></i>
+            <h3 className="font-bold text-sm">Resmi Duyurular</h3>
           </div>
-        ) : pinnedPosts.length > 0 ? (
-          <div className="space-y-2">
-            {pinnedPosts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/post/${post.id}`}
-                className="block p-3 bg-primary/5 hover:bg-primary/10 rounded-lg border-l-2 border-primary transition-colors"
-              >
-                <p className="text-sm font-semibold line-clamp-2 break-words">
-                  {post.title}
-                </p>
-                {post.content && (
-                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 line-clamp-1">
-                    {post.content}
+          
+          <div className="flex flex-col gap-3">
+            {pinnedPosts.map(post => (
+              <div key={post.id} className="group">
+                <Link href={`/post/${post.id}`}>
+                  <h4 className="font-semibold text-sm mb-1 group-hover:text-primary transition-colors line-clamp-2">
+                    {post.title}
+                  </h4>
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                    {(post.authorRole === 'admin' || post.authorRole === 'moderator') ? 'Yönetici Duyurusu' : `Gönderen: ${post.authorNickname}`}
                   </p>
-                )}
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
-        ) : (
-          <div className="p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
-            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-              Henüz sabitlenmiş duyuru yok.
-            </p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Yaklaşan Etkinlikler */}
       <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
-        <h3 className="font-bold text-sm mb-3">Yaklaşan Etkinlikler</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-sm">Yaklaşan Etkinlikler</h3>
+          <Link href="/etkinlikler" className="text-xs text-primary hover:underline">
+            Tümünü Gör
+          </Link>
+        </div>
+        
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 text-primary rounded-lg p-2 flex flex-col items-center justify-center h-12 w-12 flex-shrink-0">
-              <span className="text-[10px] font-bold">ARA</span>
-              <span className="text-lg font-extrabold -mt-1">20</span>
-            </div>
-            <div>
-              <p className="font-semibold text-sm">Kariyer Günleri</p>
-              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                Kongre Merkezi
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 text-primary rounded-lg p-2 flex flex-col items-center justify-center h-12 w-12 flex-shrink-0">
-              <span className="text-[10px] font-bold">ARA</span>
-              <span className="text-lg font-extrabold -mt-1">25</span>
-            </div>
-            <div>
-              <p className="font-semibold text-sm">Yılbaşı Konseri</p>
-              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                Amfi Tiyatro
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 text-primary rounded-lg p-2 flex flex-col items-center justify-center h-12 w-12 flex-shrink-0">
-              <span className="text-[10px] font-bold">OCA</span>
-              <span className="text-lg font-extrabold -mt-1">10</span>
-            </div>
-            <div>
-              <p className="font-semibold text-sm">Final Dönemi Başlangıcı</p>
-              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                Tüm Fakülteler
-              </p>
-            </div>
-          </div>
+          {upcomingEvents.length > 0 ? (
+            upcomingEvents.map(event => (
+              <div key={event.id} className="flex items-center gap-3">
+                <div className="bg-primary/10 text-primary rounded-lg p-2 flex flex-col items-center justify-center h-12 w-12 flex-shrink-0">
+                  <span className="text-[10px] font-bold uppercase">
+                    {format(event.date.toDate(), 'MMM', { locale: tr }).replace('.', '')}
+                  </span>
+                  <span className="text-lg font-extrabold -mt-1">
+                    {format(event.date.toDate(), 'dd')}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm truncate" title={event.title}>{event.title}</p>
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">
+                    {event.location}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+              Yakın zamanda etkinlik bulunmuyor.
+            </p>
+          )}
         </div>
       </div>
 

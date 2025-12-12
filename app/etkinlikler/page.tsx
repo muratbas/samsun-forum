@@ -1,186 +1,368 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { 
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+  startOfWeek, 
+  endOfWeek, 
+  eachDayOfInterval, 
+  isSameMonth, 
+  isSameDay, 
+  addMonths, 
+  subMonths,
+  isToday
+} from 'date-fns'
+import { tr } from 'date-fns/locale'
+import { useAuth } from '@/contexts/AuthContext'
+import { getEvents, deleteEvent } from '@/lib/events'
+import { Event } from '@/types'
+import CreateEventModal from '@/components/CreateEventModal'
+import ConfirmModal from '@/components/ConfirmModal'
+
+const CATEGORIES = [
+  'Konser',
+  'Festival',
+  'Spor',
+  'Sanat & Kültür',
+  'Topluluk Buluşması',
+  'Akademik',
+  'Diğer'
+]
 
 export default function EventsPage() {
+  const { user } = useAuth()
+  const [currentDate, setCurrentDate] = useState(new Date())
+  const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES)
+  const [view, setView] = useState<'Month' | 'Week' | 'List'>('Month')
+  
+  // Silme işlemi için state
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Takvim grid hesaplaması
+  const monthStart = startOfMonth(currentDate)
+  const monthEnd = endOfMonth(monthStart)
+  const startDate = startOfWeek(monthStart, { weekStartsOn: 1 }) // Pazartesi başlasın
+  const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 })
+
+  const calendarDays = eachDayOfInterval({
+    start: startDate,
+    end: endDate
+  })
+
+  // Verileri çek
+  const fetchEvents = async () => {
+    try {
+      setLoading(true)
+      const data = await getEvents()
+      setEvents(data)
+    } catch (error) {
+      console.error('Etkinlikler yüklenemedi:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  // Kategori filtreleme toggle
+  const toggleCategory = (category: string) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter(c => c !== category))
+    } else {
+      setSelectedCategories([...selectedCategories, category])
+    }
+  }
+
+  // Etkinlik silme
+  const handleDelete = async () => {
+    if (!deleteId || !user || user.role !== 'admin') return
+    
+    try {
+      setIsDeleting(true)
+      await deleteEvent(deleteId, user.uid)
+      await fetchEvents() // Listeyi yenile
+      setDeleteId(null)
+    } catch (error) {
+      console.error('Event delete error:', error)
+      alert('Etkinlik silinemedi')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  // Günün etkinliklerini al
+  const getDayEvents = (day: Date) => {
+    return events.filter(event => 
+      isSameDay(event.date.toDate(), day) && 
+      selectedCategories.includes(event.category)
+    )
+  }
+
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      {/* Sidebar */}
+    <div className="flex flex-col lg:flex-row gap-8 min-h-screen">
+      
+      {/* Sidebar - Takvim Navigasyon & Filtreler */}
       <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0">
         <div className="sticky top-24 space-y-6">
+          
+          {/* Mini Takvim Navigasyonu */}
           <div className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark">
-            <p className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark mb-4">Jump to Date</p>
+            <p className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark mb-4">
+              Tarihe Git
+            </p>
             <div className="flex min-w-full flex-col">
-              <div className="flex items-center p-1 justify-between">
-                <button className="flex items-center justify-center size-8 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark">
+              <div className="flex items-center p-1 justify-between mb-4">
+                <button 
+                  onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+                  className="flex items-center justify-center size-8 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                >
                   <span className="material-symbols-outlined text-base">chevron_left</span>
                 </button>
-                <p className="text-text-primary-light dark:text-text-primary-dark text-sm font-bold leading-tight flex-1 text-center">October 2024</p>
-                <button className="flex items-center justify-center size-8 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark">
+                <p className="text-sm font-bold leading-tight flex-1 text-center capitalize">
+                  {format(currentDate, 'MMMM yyyy', { locale: tr })}
+                </p>
+                <button 
+                  onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+                  className="flex items-center justify-center size-8 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                >
                   <span className="material-symbols-outlined text-base">chevron_right</span>
                 </button>
               </div>
-              <div className="grid grid-cols-7 gap-1 mt-2">
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">S</p>
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">M</p>
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">T</p>
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">W</p>
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">T</p>
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">F</p>
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">S</p>
-                <button className="h-8 w-full text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium col-start-3"><div className="flex size-full items-center justify-center rounded-full">1</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">2</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">3</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">4</div></button>
-                <button className="h-8 w-full text-white text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full bg-primary">5</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">6</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">7</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">8</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">9</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">10</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">11</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">12</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">13</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">14</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">15</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">16</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">17</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">18</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">19</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">20</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">21</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">22</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">23</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">24</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">25</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">26</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">27</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">28</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">29</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">30</div></button>
-                <button className="h-8 w-full text-text-primary-light dark:text-text-primary-dark text-xs font-medium"><div className="flex size-full items-center justify-center rounded-full hover:bg-primary/10 dark:hover:bg-primary/20">31</div></button>
+              
+              {/* Mini Takvim Grid */}
+              <div className="grid grid-cols-7 gap-1 mt-2 text-center">
+                {['P','S','Ç','P','C','C','P'].map(day => (
+                  <p key={day} className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">
+                    {day}
+                  </p>
+                ))}
+                
+                {calendarDays.map((day, i) => {
+                  const isCurrentMonth = isSameMonth(day, currentDate)
+                  const isTodayDate = isToday(day)
+                  const isSelected = isSameDay(day, currentDate) // Belki seçili günü göstermek isteriz ama şimdilik sadece ayı gösteriyoruz
+                  
+                  return (
+                    <div 
+                      key={day.toISOString()} 
+                      className={`
+                        h-8 w-full flex items-center justify-center text-xs font-medium rounded-full
+                        ${!isCurrentMonth ? 'text-text-secondary-light/30 dark:text-text-secondary-dark/30' : 'text-text-primary-light dark:text-text-primary-dark'}
+                        ${isTodayDate ? 'bg-primary text-white' : ''}
+                      `}
+                    >
+                      {format(day, 'd')}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
+
+          {/* Kategoriler */}
           <div className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark">
-            <p className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark mb-4">Categories</p>
+            <p className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark mb-4">
+              Kategoriler
+            </p>
             <div className="space-y-3">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input defaultChecked className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-primary focus:ring-primary focus:ring-2" type="checkbox"/>
-                <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Konserler</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-primary focus:ring-primary focus:ring-2" type="checkbox"/>
-                <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Festivaller</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input defaultChecked className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-primary focus:ring-primary focus:ring-2" type="checkbox"/>
-                <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Spor</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-primary focus:ring-primary focus:ring-2" type="checkbox"/>
-                <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Sanat & Kültür</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-primary focus:ring-primary focus:ring-2" type="checkbox"/>
-                <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Topluluk Buluşmaları</span>
-              </label>
+              {CATEGORIES.map(category => (
+                <label key={category} className="flex items-center gap-3 cursor-pointer select-none">
+                  <input 
+                    type="checkbox"
+                    checked={selectedCategories.includes(category)}
+                    onChange={() => toggleCategory(category)}
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-primary focus:ring-primary focus:ring-2" 
+                  />
+                  <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">
+                    {category}
+                  </span>
+                </label>
+              ))}
             </div>
           </div>
         </div>
       </aside>
       
-      {/* Main content */}
-      <div className="flex-1">
+      {/* Ana İçerik */}
+      <div className="flex-1 pb-10">
+        
+        {/* Breadcrumb */}
         <div className="flex flex-wrap gap-2 text-sm mb-4">
-          <a className="text-text-secondary-light dark:text-text-secondary-dark hover:underline" href="#">Forum</a>
+          <a className="text-text-secondary-light dark:text-text-secondary-dark hover:underline" href="/">Forum</a>
           <span className="text-text-secondary-light dark:text-text-secondary-dark">/</span>
           <span className="text-text-primary-light dark:text-text-primary-dark font-medium">Etkinlikler</span>
         </div>
+
+        {/* Başlık ve Ekle Butonu */}
         <div className="flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex flex-col gap-1">
-            <h1 className="text-text-primary-light dark:text-text-primary-dark text-4xl font-black leading-tight tracking-[-0.033em]">Samsun Etkinlik Takvimi</h1>
-            <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">View, add, and filter events happening in Samsun.</p>
+            <h1 className="text-text-primary-light dark:text-text-primary-dark text-4xl font-black leading-tight tracking-[-0.033em]">
+              Samsun Etkinlik Takvimi
+            </h1>
+            <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">
+              Samsun'daki etkinlikleri görüntüle, filtrele ve takvime ekle.
+            </p>
           </div>
-          <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2 hover:bg-primary/90 transition-colors">
-            <span className="material-symbols-outlined text-base">add_circle</span>
-            <span className="truncate">Add New Event</span>
-          </button>
+          
+          {user?.role === 'admin' && (
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2 hover:bg-primary/90 transition-colors"
+            >
+              <span className="material-symbols-outlined text-base">add_circle</span>
+              <span className="truncate">Yeni Etkinlik Ekle</span>
+            </button>
+          )}
         </div>
+
+        {/* Kontroller */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-          <div className="w-full sm:w-64">
+          <div className="w-full sm:w-auto">
             <div className="flex h-10 items-center justify-center rounded-lg bg-black/5 dark:bg-border-dark p-1 text-sm font-medium">
-              <label className="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-surface-light dark:has-[:checked]:bg-background-dark has-[:checked]:shadow-sm has-[:checked]:text-text-primary-light dark:has-[:checked]:text-text-primary-dark text-text-secondary-light dark:text-text-secondary-dark transition-all">
-                <span className="truncate">Month</span>
-                <input defaultChecked className="invisible w-0" name="calendar-view" type="radio" value="Month"/>
-              </label>
-              <label className="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-surface-light dark:has-[:checked]:bg-background-dark has-[:checked]:shadow-sm has-[:checked]:text-text-primary-light dark:has-[:checked]:text-text-primary-dark text-text-secondary-light dark:text-text-secondary-dark transition-all">
-                <span className="truncate">Week</span>
-                <input className="invisible w-0" name="calendar-view" type="radio" value="Week"/>
-              </label>
-              <label className="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-surface-light dark:has-[:checked]:bg-background-dark has-[:checked]:shadow-sm has-[:checked]:text-text-primary-light dark:has-[:checked]:text-text-primary-dark text-text-secondary-light dark:text-text-secondary-dark transition-all">
-                <span className="truncate">List</span>
-                <input className="invisible w-0" name="calendar-view" type="radio" value="List"/>
-              </label>
+              <button 
+                onClick={() => setView('Month')}
+                className={`flex cursor-pointer h-full px-4 items-center justify-center rounded-lg transition-all ${view === 'Month' ? 'bg-surface-light dark:bg-surface-dark shadow-sm text-primary' : 'text-text-secondary-light dark:text-text-secondary-dark'}`}
+              >
+                Ay
+              </button>
+              {/* Şimdilik sadece Ay görünümü aktif, diğerleri sonra eklenebilir */}
+              <button 
+                disabled
+                className="flex cursor-pointer h-full px-4 items-center justify-center rounded-lg text-text-secondary-light/50 dark:text-text-secondary-dark/50 cursor-not-allowed"
+              >
+                Hafta
+              </button>
+              <button 
+                disabled
+                className="flex cursor-pointer h-full px-4 items-center justify-center rounded-lg text-text-secondary-light/50 dark:text-text-secondary-dark/50 cursor-not-allowed"
+              >
+                Liste
+              </button>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark transition-colors">
+            <button 
+              onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+              className="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark transition-colors"
+            >
               <span className="material-symbols-outlined text-xl">chevron_left</span>
             </button>
-            <button className="h-10 px-4 rounded-lg text-sm font-bold text-text-primary-light dark:text-text-primary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Today</button>
-            <button className="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark transition-colors">
+            <button 
+              onClick={() => setCurrentDate(new Date())}
+              className="h-10 px-4 rounded-lg text-sm font-bold text-text-primary-light dark:text-text-primary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            >
+              Bugün
+            </button>
+            <button 
+              onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+              className="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark transition-colors"
+            >
               <span className="material-symbols-outlined text-xl">chevron_right</span>
             </button>
           </div>
         </div>
-        <div className="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden">
-          <div className="grid grid-cols-7 text-center font-bold text-sm text-text-secondary-light dark:text-text-secondary-dark border-b border-border-light dark:border-border-dark">
-            <div className="py-4">Sun</div>
-            <div className="py-4 border-l border-border-light dark:border-border-dark">Mon</div>
-            <div className="py-4 border-l border-border-light dark:border-border-dark">Tue</div>
-            <div className="py-4 border-l border-border-light dark:border-border-dark">Wed</div>
-            <div className="py-4 border-l border-border-light dark:border-border-dark">Thu</div>
-            <div className="py-4 border-l border-border-light dark:border-border-dark">Fri</div>
-            <div className="py-4 border-l border-border-light dark:border-border-dark">Sat</div>
-          </div>
-          <div className="grid grid-cols-7 grid-rows-5 h-[720px]">
-            {/* Calendar Days */}
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-secondary-light dark:text-text-secondary-dark">29</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-secondary-light dark:text-text-secondary-dark">30</div>
-            
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">1</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">2</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">3</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">4</div>
-            <div className="p-2 border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium bg-primary/10 dark:bg-primary/20">
-              <span className="font-bold text-primary">5</span>
-              <div className="mt-1 space-y-1">
-                <div className="p-1.5 rounded bg-primary text-white text-xs font-semibold leading-tight text-left cursor-pointer hover:bg-primary/90">Samsunspor Match</div>
-              </div>
-            </div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">6</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">7</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">8</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">9</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">10</div>
-            <div className="p-2 border-r border-b border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium">
-              11
-              <div className="mt-1 space-y-1">
-                <div className="p-1.5 rounded bg-blue-500 text-white text-xs font-semibold leading-tight text-left cursor-pointer hover:bg-blue-600">Teknofest Karadeniz</div>
-              </div>
-            </div>
-            {/* Rest of the days */}
-            {[...Array(20)].map((_, i) => (
-              <div key={i} className={`p-2 ${i % 7 !== 6 ? 'border-r' : ''} ${i < 13 ? 'border-b' : ''} border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark font-medium`}>
-                {12 + i}
+
+        {/* Takvim Grid */}
+        <div className="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-sm">
+          {/* Gün Başlıkları */}
+          <div className="grid grid-cols-7 text-center font-bold text-sm text-text-secondary-light dark:text-text-secondary-dark border-b border-border-light dark:border-border-dark bg-black/5 dark:bg-white/5">
+            {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((day, i) => (
+              <div key={day} className={`py-3 ${i > 0 ? 'border-l border-border-light dark:border-border-dark' : ''}`}>
+                {day}
               </div>
             ))}
-            <div className="p-2 border-r text-text-secondary-light dark:text-text-secondary-dark">1</div>
-            <div className="p-2 text-text-secondary-light dark:text-text-secondary-dark">2</div>
+          </div>
+
+          {/* Günler */}
+          <div className="grid grid-cols-7 auto-rows-[minmax(80px,auto)]">
+            {calendarDays.map((day, i) => {
+              const dayEvents = getDayEvents(day)
+              const isCurrentMonth = isSameMonth(day, currentDate)
+              const isTodayDate = isToday(day)
+
+              return (
+                <div 
+                  key={day.toISOString()} 
+                  className={`
+                    p-1.5 border-border-light dark:border-border-dark
+                    ${(i + 1) % 7 !== 0 ? 'border-r' : ''} 
+                    ${i < calendarDays.length - 7 ? 'border-b' : ''}
+                    ${!isCurrentMonth ? 'bg-black/5 dark:bg-white/5 text-text-secondary-light/50 dark:text-text-secondary-dark/50' : ''}
+                    min-h-[80px] transition-colors hover:bg-black/5 dark:hover:bg-white/5
+                  `}
+                >
+                  <div className="flex justify-between items-start">
+                    <span className={`
+                      text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full
+                      ${isTodayDate ? 'bg-primary text-white font-bold' : ''}
+                      ${!isCurrentMonth && !isTodayDate ? 'text-text-secondary-light dark:text-text-secondary-dark' : ''}
+                    `}>
+                      {format(day, 'd')}
+                    </span>
+                  </div>
+                  
+                  {/* Etkinlikler */}
+                  <div className="mt-1 space-y-1">
+                    {dayEvents.map(event => (
+                      <div 
+                        key={event.id} 
+                        className="group relative p-1.5 rounded bg-primary/10 text-primary text-xs font-semibold leading-tight text-left cursor-pointer hover:bg-primary hover:text-white transition-all overflow-hidden"
+                      >
+                        <div className="truncate">
+                          {format(event.date.toDate(), 'HH:mm')} - {event.title}
+                        </div>
+                        
+                        {/* Admin Silme Butonu */}
+                        {user?.role === 'admin' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setDeleteId(event.id)
+                            }}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-0.5 rounded-full bg-white text-primary hover:bg-red-100 hover:text-red-500 transition-opacity"
+                            title="Etkinliği Sil"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">delete</span>
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <CreateEventModal 
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          fetchEvents()
+          setShowCreateModal(false)
+        }}
+      />
+
+      <ConfirmModal
+        isOpen={!!deleteId}
+        title="Etkinliği Sil"
+        message="Bu etkinliği silmek istediğinize emin misiniz?"
+        confirmText="Sil"
+        cancelText="İptal"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
+        loading={isDeleting}
+      />
     </div>
   )
 }
