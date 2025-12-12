@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { getPost } from '@/lib/posts'
+import { getPost, deletePost } from '@/lib/posts'
 import { getCommentsByPost, createComment } from '@/lib/comments'
 import { upvotePost, downvotePost, getUserVote } from '@/lib/votes'
 import { Post, Comment } from '@/types'
@@ -12,9 +12,12 @@ import { tr } from 'date-fns/locale'
 import { Linkify } from '@/lib/linkify'
 import LeftSidebar from '@/components/LeftSidebar'
 import RightSidebar from '@/components/RightSidebar'
+import AdminBadge from '@/components/AdminBadge'
+import ConfirmModal from '@/components/ConfirmModal'
 
 export default function PostDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const postId = params.id as string
   const { user } = useAuth()
   
@@ -28,6 +31,15 @@ export default function PostDetailPage() {
   const [voteState, setVoteState] = useState<'upvote' | 'downvote' | null>(null)
   const [currentScore, setCurrentScore] = useState(0)
   const [voting, setVoting] = useState(false)
+
+  // Menu state
+  const [showMenu, setShowMenu] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Silme yetkisi kontrolü
+  const canDelete = user && post && (user.uid === post.authorId || user.role === 'admin')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,6 +138,40 @@ export default function PostDetailPage() {
     }
   }
 
+  // Menü dışına tıklanınca kapat
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleDeleteClick = () => {
+    setShowMenu(false)
+    setShowConfirm(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!user || !canDelete || !post) return
+
+    try {
+      setDeleting(true)
+      await deletePost(post.id, user.uid, user.role === 'admin')
+      
+      // Ana sayfaya yönlendir
+      router.push('/')
+    } catch (error) {
+      console.error('Silme hatası:', error)
+      alert('Gönderi silinemedi!')
+      setDeleting(false)
+      setShowConfirm(false)
+    }
+  }
+
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -143,7 +189,8 @@ export default function PostDetailPage() {
         user.uid,
         user.nickname,
         user.photoURL,
-        commentText.trim()
+        commentText.trim(),
+        user.role
       )
       
       // Yorumları yeniden yükle
@@ -229,7 +276,7 @@ export default function PostDetailPage() {
             <div className="flex-1 min-w-0">
           
           {/* Post Detay */}
-          <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-border-light/60 dark:border-border-dark/60 mb-4">
+          <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-border-light/60 dark:border-border-dark/60 mb-4 overflow-hidden">
             {/* Üst Kısım - Kullanıcı Bilgisi + Üç Nokta */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -245,6 +292,7 @@ export default function PostDetailPage() {
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="font-semibold text-sm">{post.authorNickname}</span>
+                  {post.authorRole === 'admin' && <AdminBadge />}
                   <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">•</span>
                   <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">{timeAgo}</span>
                   <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">•</span>
@@ -254,19 +302,45 @@ export default function PostDetailPage() {
                 </div>
               </div>
               
-              <button className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark">
-                <span className="material-symbols-outlined">more_horiz</span>
-              </button>
+              {/* Üç Nokta Menü */}
+              <div className="relative" ref={menuRef}>
+                <button 
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark"
+                >
+                  <span className="material-symbols-outlined">more_horiz</span>
+                </button>
+
+                {/* Dropdown Menü */}
+                {showMenu && (
+                  <div className="absolute right-0 mt-1 w-48 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark py-1 z-50">
+                    {canDelete && (
+                      <button
+                        onClick={handleDeleteClick}
+                        className="w-full text-left px-4 py-2 text-sm text-primary hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-lg">delete</span>
+                        Gönderiyi Kaldır
+                      </button>
+                    )}
+                    {!canDelete && (
+                      <p className="px-4 py-2 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                        Seçenek yok
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Başlık */}
-            <h1 className="text-xl font-bold leading-snug mb-3">
+            <h1 className="text-xl font-bold leading-snug mb-3 break-words">
               <Linkify text={post.title} />
             </h1>
 
             {/* İçerik */}
             {post.content && (
-              <p className="text-text-primary-light dark:text-text-primary-dark text-base leading-relaxed mb-4">
+              <p className="text-text-primary-light dark:text-text-primary-dark text-base leading-relaxed mb-4 break-words">
                 <Linkify text={post.content} />
               </p>
             )}
@@ -291,7 +365,7 @@ export default function PostDetailPage() {
                     : 'border-border-light dark:border-border-dark text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5'
                 } disabled:opacity-50 transition-colors`}
               >
-                <span className="material-symbols-outlined text-lg">thumb_up</span>
+                <i className="hgi-stroke hgi-thumbs-up text-lg"></i>
                 <span className="text-sm font-medium">{currentScore}</span>
               </button>
 
@@ -305,18 +379,18 @@ export default function PostDetailPage() {
                     : 'border-border-light dark:border-border-dark text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5'
                 } disabled:opacity-50 transition-colors`}
               >
-                <span className="material-symbols-outlined text-lg">thumb_down</span>
+                <i className="hgi-stroke hgi-thumbs-down text-lg"></i>
               </button>
 
               {/* Yorum Sayısı */}
               <div className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">
-                <span className="material-symbols-outlined text-lg">chat_bubble_outline</span>
+                <i className="hgi-stroke hgi-comment-01 text-lg"></i>
                 <span>{post.commentCount} yorum</span>
               </div>
 
               {/* Paylaş */}
               <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                <span className="material-symbols-outlined text-lg">share</span>
+                <i className="hgi-stroke hgi-share-08 text-lg"></i>
               </button>
             </div>
           </div>
@@ -383,6 +457,18 @@ export default function PostDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Silme Onay Modal */}
+      <ConfirmModal
+        isOpen={showConfirm}
+        title="Gönderiyi Kaldır"
+        message="Bu gönderiyi kaldırmak istediğinize emin misiniz? Bu işlem geri alınamaz."
+        confirmText="Kaldır"
+        cancelText="İptal"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowConfirm(false)}
+        loading={deleting}
+      />
     </div>
   )
 }
@@ -408,6 +494,7 @@ function CommentItem({ comment }: { comment: Comment }) {
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
           <span className="font-semibold text-sm">{comment.authorNickname}</span>
+          {comment.authorRole === 'admin' && <AdminBadge />}
           <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">{timeAgo}</span>
         </div>
         <p className="text-text-primary-light dark:text-text-primary-dark text-sm">

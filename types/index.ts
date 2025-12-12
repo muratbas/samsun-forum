@@ -21,6 +21,7 @@ export interface Post {
   authorId: string
   authorNickname: string
   authorPhotoURL: string
+  authorRole?: 'user' | 'moderator' | 'admin'
   title: string
   content?: string
   imageUrl?: string
@@ -64,6 +65,7 @@ export interface Comment {
   authorId: string
   authorNickname: string
   authorPhotoURL: string
+  authorRole?: 'user' | 'moderator' | 'admin'
   content: string
   createdAt: Timestamp
   updatedAt: Timestamp

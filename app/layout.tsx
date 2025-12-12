@@ -53,6 +53,11 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
           rel="stylesheet"
         />
+        {/* Hugeicons */}
+        <link
+          href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"
+          rel="stylesheet"
+        />
       </head>
       <body className={`${sfProDisplay.variable} font-sf-pro`}>
         <ThemeProvider>

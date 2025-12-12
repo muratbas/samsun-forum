@@ -25,13 +25,15 @@ export const createPost = async (
   content: string,
   topicId: string,
   topicName: string,
-  imageUrl?: string
+  imageUrl?: string,
+  authorRole?: 'user' | 'moderator' | 'admin'
 ) => {
   try {
     const postData = {
       authorId,
       authorNickname,
       authorPhotoURL,
+      authorRole: authorRole || 'user',
       title,
       content: content || '',
       imageUrl: imageUrl || '',

@@ -30,11 +30,6 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
       return
     }
 
-    if (!selectedTopic) {
-      setError('Lütfen bir konu seç')
-      return
-    }
-
     if (!user) {
       setError('Giriş yapman gerekiyor')
       return
@@ -44,7 +39,10 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
     setError('')
 
     try {
-      const topic = getTopicById(selectedTopic)!
+      // Konu seçilmişse onu kullan, yoksa "Genel" kullan
+      const topic = selectedTopic ? getTopicById(selectedTopic) : null
+      const topicId = topic?.id || 'genel'
+      const topicName = topic?.name || 'Genel'
       
       await createPost(
         user.uid,
@@ -52,8 +50,10 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
         user.photoURL,
         title,
         content,
-        topic.id,
-        topic.name
+        topicId,
+        topicName,
+        undefined, // imageUrl
+        user.role
       )
 
       // Formu temizle ve kapat
@@ -98,11 +98,11 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Gönderinize bir başlık verin..."
               className="w-full px-4 py-3 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-primary"
-              maxLength={200}
+              maxLength={50}
               disabled={loading}
             />
             <p className="text-xs text-text-secondary-dark mt-1">
-              {title.length}/200
+              {title.length}/50
             </p>
           </div>
 
@@ -117,18 +117,18 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
               placeholder="Detayları buraya yazabilirsin..."
               className="w-full px-4 py-3 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               rows={6}
-              maxLength={5000}
+              maxLength={2000}
               disabled={loading}
             />
             <p className="text-xs text-text-secondary-dark mt-1">
-              {content.length}/5000
+              {content.length}/2000
             </p>
           </div>
 
           {/* Konu Seçimi - Liste Formatı */}
           <div>
             <label className="block text-sm font-bold mb-3">
-              Konu Seç <span className="text-primary">*</span>
+              Konu Seç <span className="text-text-secondary-dark font-normal">(Opsiyonel)</span>
             </label>
             <div className="flex flex-col gap-1 max-h-64 overflow-y-auto">
               {TOPICS.map((topic) => (
@@ -171,7 +171,7 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
             </button>
             <button
               type="submit"
-              disabled={loading || title.length < 5 || !selectedTopic}
+              disabled={loading || title.length < 5}
               className="flex-1 bg-primary text-white rounded-lg py-3 px-4 font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Paylaşılıyor...' : 'Paylaş'}

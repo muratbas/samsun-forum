@@ -76,10 +76,18 @@ export default function PostFeed({ sortBy = 'hot' }: PostFeedProps) {
     )
   }
 
+  const handlePostDelete = (postId: string) => {
+    setPosts(posts.filter(p => p.id !== postId))
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <PostCard 
+          key={post.id} 
+          post={post} 
+          onDelete={() => handlePostDelete(post.id)}
+        />
       ))}
     </div>
   )

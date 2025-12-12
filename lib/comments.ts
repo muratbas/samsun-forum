@@ -19,7 +19,8 @@ export const createComment = async (
   authorId: string,
   authorNickname: string,
   authorPhotoURL: string,
-  content: string
+  content: string,
+  authorRole?: 'user' | 'moderator' | 'admin'
 ) => {
   try {
     const commentData = {
@@ -27,6 +28,7 @@ export const createComment = async (
       authorId,
       authorNickname,
       authorPhotoURL,
+      authorRole: authorRole || 'user',
       content,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
