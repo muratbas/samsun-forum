@@ -172,7 +172,7 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
 
           {/* Admin: Sabitle Toggle */}
           {isAdmin && (
-            <div className="flex items-center justify-between p-3 bg-surface-dark/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
               <div className="flex items-center gap-2">
                 <i className="hgi-stroke hgi-pin text-lg text-primary"></i>
                 <span className="text-sm font-medium">Resmi Duyuru Olarak Sabitle</span>
@@ -181,13 +181,13 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
                 type="button"
                 onClick={() => setPinned(!pinned)}
                 disabled={loading}
-                className={`relative w-12 h-6 rounded-full transition-colors ${
-                  pinned ? 'bg-primary' : 'bg-border-dark'
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  pinned ? 'bg-primary' : 'bg-gray-300 dark:bg-white/10'
                 }`}
               >
                 <span
-                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    pinned ? 'translate-x-7' : 'translate-x-1'
+                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    pinned ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>

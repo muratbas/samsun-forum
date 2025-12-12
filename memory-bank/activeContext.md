@@ -29,6 +29,8 @@ Proje şu anda **tam fonksiyonel forum platformu** durumunda. Temel ve gelişmi�
 11. **UI Güncellemesi** - RightSidebar'daki sabitleme yazısı kaldırıldı
 12. **Icon Güncellemesi** - Popüler butonu yıldız ikonu, Yeni butonu alev ikonu olarak güncellendi
 13. **LeftSidebar Düzenlemesi** - Ana Akışlar menüsünden Popüler, Taze ve Aboneliklerim kaldırıldı
+14. **Bug Fix** - CreatePostModal'daki toggle switch renk ve pozisyon hatası düzeltildi
+15. **Yeni Sayfa** - Etkinlik Takvimi sayfası (`/etkinlikler`) oluşturuldu (statik mockup olarak)
 
 ## Bilinen Sorunlar
 

@@ -64,7 +64,7 @@ export default function LeftSidebar() {
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              href="/events"
+              href="/etkinlikler"
             >
               <i className="bi bi-calendar-event text-lg"></i>
               <span className="text-sm font-normal">Etkinlik Takvimi</span>
