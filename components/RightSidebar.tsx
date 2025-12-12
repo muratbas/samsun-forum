@@ -16,7 +16,7 @@ export default function RightSidebar() {
   const [quote, setQuote] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // Mock data - sonra Firebase'den gelecek
+  // Mock data - Manuel Gündem Başlıkları
   const trendingTopics = [
     '#FinalHaftası', '#Sınav', '#Yemekhane', 
     '#Kulüpler', '#Etkinlik', '#Kampüs'

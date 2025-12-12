@@ -7,6 +7,7 @@ import { signOut, checkUserExists } from '@/lib/auth'
 import LoginModal from './LoginModal'
 import NicknameModal from './NicknameModal'
 import CreatePostModal from './CreatePostModal'
+import Image from 'next/image'
 
 export default function Header() {
   const { user, firebaseUser, loading, refreshUser } = useAuth()
@@ -63,10 +64,12 @@ export default function Header() {
     <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 sm:px-6 lg:px-8 py-3">
       {/* Logo ve Marka */}
       <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-        <img 
+        <Image 
           src="/omu-logo.png" 
           alt="OMÜ Logo" 
-          className="w-9 h-9 rounded-full object-cover"
+          width={36}
+          height={36}
+          className="rounded-full object-cover"
         />
         {/* Desktop'ta tam isim */}
         <h1 className="text-xl font-bold tracking-tight hidden sm:block">
@@ -134,12 +137,17 @@ export default function Header() {
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="bg-center bg-no-repeat bg-cover rounded-full size-10 cursor-pointer hover:ring-2 hover:ring-primary"
-              style={{
-                backgroundImage: `url("${user.photoURL}")`,
-              }}
+              className="relative rounded-full size-10 cursor-pointer hover:ring-2 hover:ring-primary overflow-hidden"
               title={user.nickname}
-            />
+            >
+              <Image 
+                src={user.photoURL || '/placeholder-avatar.png'} 
+                alt={user.nickname}
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            </button>
             
             {/* User Menu */}
             {showUserMenu && (
