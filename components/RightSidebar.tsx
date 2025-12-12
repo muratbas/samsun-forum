@@ -88,9 +88,7 @@ export default function RightSidebar() {
           <h3 className="font-bold text-sm">Resmi Duyurular</h3>
           <i className="hgi-stroke hgi-pin text-primary"></i>
         </div>
-        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mb-3">
-          Pinned by admin
-        </p>
+
         
         {loading ? (
           <div className="space-y-2">

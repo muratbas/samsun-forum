@@ -16,27 +16,6 @@ export default function LeftSidebar() {
               <i className="bi bi-house-door text-lg"></i>
               <span className="text-sm font-medium">Anasayfa</span>
             </a>
-            <a
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              href="/popular"
-            >
-              <i className="bi bi-star text-lg"></i>
-              <span className="text-sm font-normal">Popüler</span>
-            </a>
-            <a
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              href="/fresh"
-            >
-              <i className="bi bi-lightning text-lg"></i>
-              <span className="text-sm font-normal">Taze</span>
-            </a>
-            <a
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              href="/subscriptions"
-            >
-              <i className="bi bi-rss text-lg"></i>
-              <span className="text-sm font-normal">Aboneliklerim</span>
-            </a>
           </nav>
         </div>
 
