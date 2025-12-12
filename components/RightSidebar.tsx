@@ -1,11 +1,34 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { getPinnedPosts } from '@/lib/posts'
+import { Post } from '@/types'
+import Link from 'next/link'
+
 export default function RightSidebar() {
+  const [pinnedPosts, setPinnedPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+
   // Mock data - sonra Firebase'den gelecek
   const trendingTopics = [
     '#FinalHaftası', '#Sınav', '#Yemekhane', 
     '#Kulüpler', '#Etkinlik', '#Kampüs'
   ]
+
+  useEffect(() => {
+    const loadPinnedPosts = async () => {
+      try {
+        const posts = await getPinnedPosts(3)
+        setPinnedPosts(posts)
+      } catch (error) {
+        console.error('Sabitlenmiş postlar yüklenemedi:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadPinnedPosts()
+  }, [])
 
   return (
     <div className="flex flex-col gap-4">
@@ -63,19 +86,42 @@ export default function RightSidebar() {
       <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
         <div className="flex items-center gap-2 mb-1">
           <h3 className="font-bold text-sm">Resmi Duyurular</h3>
-          <i className="bi bi-pin-angle-fill text-primary"></i>
+          <i className="hgi-stroke hgi-pin text-primary"></i>
         </div>
         <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mb-3">
           Pinned by admin
         </p>
-        <div className="space-y-3">
+        
+        {loading ? (
+          <div className="space-y-2">
+            <div className="h-16 bg-background-dark/50 rounded-lg animate-pulse"></div>
+          </div>
+        ) : pinnedPosts.length > 0 ? (
+          <div className="space-y-2">
+            {pinnedPosts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/post/${post.id}`}
+                className="block p-3 bg-primary/5 hover:bg-primary/10 rounded-lg border-l-2 border-primary transition-colors"
+              >
+                <p className="text-sm font-semibold line-clamp-2 break-words">
+                  {post.title}
+                </p>
+                {post.content && (
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1 line-clamp-1">
+                    {post.content}
+                  </p>
+                )}
+              </Link>
+            ))}
+          </div>
+        ) : (
           <div className="p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
-            <p className="text-sm">
-              <span className="font-bold text-primary">#OMÜForum</span> açıldı! 
-              Üniversitemizin dijital buluşma noktasına hoş geldiniz 🎓
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+              Henüz sabitlenmiş duyuru yok.
             </p>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Yaklaşan Etkinlikler */}
@@ -124,4 +170,3 @@ export default function RightSidebar() {
     </div>
   )
 }
-

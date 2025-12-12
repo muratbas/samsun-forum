@@ -1,12 +1,15 @@
-# Samsun Forum - İlerleme Durumu
+# OMÜForum - İlerleme Durumu
 
-## Genel Durum: 🟢 MVP Tamamlandı
+## Genel Durum: 🟢 Tam Fonksiyonel Forum Platformu
 
-Proje temel işlevselliğe sahip ve çalışır durumda. Kullanıcılar:
+Proje temel ve gelişmiş forum işlevselliğine sahip ve çalışır durumda. Kullanıcılar:
 - Google ile giriş yapabilir
 - Nickname seçebilir
-- Post oluşturabilir
+- Post oluşturabilir ve silebilir
+- Post detay sayfasında tam içeriği görebilir
+- Yorum yapabilir
 - Oylama yapabilir
+- Admin'ler post sabitleyebilir
 
 ---
 
@@ -18,16 +21,21 @@ Proje temel işlevselliğe sahip ve çalışır durumda. Kullanıcılar:
 - [x] Firebase projesi bağlantısı
 - [x] Environment variables yapısı
 - [x] TypeScript type tanımları
+- [x] Custom font entegrasyonu (SF Pro Display)
 
 ### UI/UX
 - [x] Responsive layout (3-column grid)
 - [x] Header (logo, arama, butonlar)
-- [x] LeftSidebar (navigasyon, topics)
-- [x] RightSidebar (gündem, etkinlikler - mock data)
-- [x] Dark/Light mode toggle
-- [x] Plus Jakarta Sans font
-- [x] Material Symbols icon seti
-- [x] Samsun kırmızısı (#E30613) renk teması
+- [x] LeftSidebar (navigasyon, kategoriler) - Fixed position
+- [x] RightSidebar (gündem, resmi duyurular, etkinlikler) - Static scroll
+- [x] Dark/Light mode toggle (varsayılan: dark)
+- [x] Hugeicons icon seti
+- [x] Bootstrap Icons (backup)
+- [x] Material Symbols (backup)
+- [x] OMÜ kırmızısı (#E30613) renk teması
+- [x] Pastel açık mavi background (#F4F8FB)
+- [x] PostCard modern tasarım (thumbs up/down, comment, share)
+- [x] ConfirmModal (sitestyle uyumlu onay modal'ı)
 
 ### Authentication
 - [x] Google OAuth entegrasyonu
@@ -42,25 +50,51 @@ Proje temel işlevselliğe sahip ve çalışır durumda. Kullanıcılar:
 - [x] Firestore'da user document oluşturma
 - [x] User menüsü (avatar, logout)
 - [x] Karma puanı gösterimi
+- [x] Admin rolü sistemi
+- [x] Admin badge gösterimi
 
 ### Post Sistemi
 - [x] Post oluşturma modal
-- [x] Topic seçimi (8 kategori)
+- [x] Etiket seçimi (baloncuk formatı, opsiyonel)
+- [x] Başlık limiti (50 karakter)
+- [x] İçerik limiti (2000 karakter)
 - [x] Firestore'a post kaydetme
 - [x] Post listesi (PostFeed)
 - [x] Post kartları (PostCard)
+- [x] Post detay sayfası (`/post/[id]`)
+- [x] Post silme (kendi postu veya admin)
+- [x] Post sabitleme (admin only)
 - [x] Tarih formatlama (Türkçe)
 - [x] URL linkify (tıklanabilir linkler)
 - [x] Loading skeleton
 - [x] Error handling
+- [x] Text overflow handling (break-words)
+
+### Yorum Sistemi
+- [x] Comment oluşturma
+- [x] Comment listeleme
+- [x] Comment sayısı gösterimi
+- [x] Comment author bilgisi
+- [x] Comment timestamp
+- [x] Admin badge in comments
 
 ### Oylama Sistemi
-- [x] Upvote/Downvote butonları
+- [x] Thumbs up/Down butonları (Hugeicons)
 - [x] Optimistic updates
 - [x] Firebase vote kayıtları
 - [x] Score hesaplama
 - [x] Karma güncelleme
 - [x] Vote state persistence
+
+### Admin Sistemi
+- [x] Admin rolü tanımı
+- [x] Admin badge component
+- [x] Post sabitleme/kaldırma
+- [x] Herhangi bir postu silme yetkisi
+- [x] CreatePostModal'da pin toggle
+- [x] PostCard'da pin/unpin menü seçeneği
+- [x] Post detay sayfasında pin/unpin menü seçeneği
+- [x] RightSidebar'da sabitlenmiş postlar
 
 ### Sıralama
 - [x] Popüler (score'a göre)
@@ -73,17 +107,10 @@ Proje temel işlevselliğe sahip ve çalışır durumda. Kullanıcılar:
 ## 🔄 Devam Eden / Eksik Özellikler
 
 ### Öncelik: Yüksek
-- [ ] **Comment Sistemi**
-  - Comments collection yapısı
-  - Comment oluşturma
-  - Comment listeleme
-  - Nested comments (reply)
+- [ ] **Post Düzenleme**
+  - Kullanıcılar kendi postlarını düzenleyebilmeli
+  - Post detay sayfasında düzenleme butonu
 
-- [ ] **Post Detay Sayfası**
-  - `/post/[id]` route
-  - Tam post içeriği
-  - Comments section
-  
 - [ ] **Image Upload**
   - Firebase Storage entegrasyonu
   - CreatePostModal'a resim ekleme
@@ -93,12 +120,10 @@ Proje temel işlevselliğe sahip ve çalışır durumda. Kullanıcılar:
 - [ ] User profil sayfası (`/user/[nickname]`)
 - [ ] Topic sayfası (`/topic/[slug]`)
 - [ ] Arama fonksiyonu
-- [ ] Post düzenleme
-- [ ] Post silme (UI)
+- [ ] Nested comments (reply sistemi)
 
 ### Öncelik: Düşük
-- [ ] Admin paneli
-- [ ] Moderasyon araçları
+- [ ] Moderasyon araçları geliştirme
 - [ ] Ban sistemi
 - [ ] Events section (API entegrasyonu)
 - [ ] Bildirimler
@@ -111,22 +136,26 @@ Proje temel işlevselliğe sahip ve çalışır durumda. Kullanıcılar:
 | Sorun | Durum | Notlar |
 |-------|-------|--------|
 | Firestore composite index | ⚠️ Beklemede | İlk sorguda Firebase console'dan oluşturulması gerekebilir |
-| Offline cache sorunu | ✅ Çözüldü | enableNetwork() eklendi |
-| RightSidebar mock data | ℹ️ Beklenen | Gerçek veri için API/scraping gerekli |
+| RightSidebar mock data (etkinlikler) | ℹ️ Beklenen | Gerçek veri için API/scraping gerekli |
+| Image upload | ⚠️ Henüz aktif değil | Firebase Storage entegrasyonu gerekli |
 
 ---
 
 ## 📊 Metrikler
 
 ### Kod Tabanı
-- Components: 9 adet
-- Context'ler: 2 adet
-- Lib dosyaları: 6 adet
-- TypeScript types: 5 interface
+- Components: 12 adet
+  - AdminBadge, ConfirmModal, CreatePostModal, Header, LeftSidebar, RightSidebar
+  - LoginModal, NicknameModal, PostCard, PostFeed, SortControls
+- Context'ler: 2 adet (AuthContext, ThemeContext)
+- Lib dosyaları: 7 adet (auth, comments, firebase, linkify, posts, topics, votes)
+- TypeScript types: 5 interface (User, Post, Comment, Topic, Vote, Event)
+- Pages: 2 adet (Home, PostDetail)
 
 ### Firebase Collections
-- `users`: Kullanıcı verileri
-- `posts`: Gönderiler
+- `users`: Kullanıcı verileri (role: 'admin' ile admin yapılabilir)
+- `posts`: Gönderiler (pinned: true ile sabitlenebilir)
+- `comments`: Yorumlar
 - `votes`: Oylar
 
 ---
@@ -142,27 +171,35 @@ Proje temel işlevselliğe sahip ve çalışır durumda. Kullanıcılar:
 - Authentication
 - Post CRUD
 - Voting
-
-### Phase 3: İyileştirmeler (Mevcut)
 - Comment sistemi
-- Image upload
-- Detay sayfaları
 
-### Phase 4: Gelişmiş Özellikler (Planlanan)
-- Admin paneli
-- Moderasyon
+### Phase 3: Gelişmiş Özellikler ✅
+- Post detay sayfası
+- Post silme
+- Admin sistemi
+- Post sabitleme
+- UI iyileştirmeleri
+
+### Phase 4: İyileştirmeler (Mevcut)
+- Post düzenleme
+- Image upload
+- User profil sayfası
+
+### Phase 5: Gelişmiş Özellikler (Planlanan)
+- Moderasyon araçları
 - Events section
+- Arama fonksiyonu
+- Bildirimler
 
 ---
 
 ## 🎯 Sonraki Sprint Hedefleri
 
-1. Comment sistemi implementasyonu
-2. Post detay sayfası oluşturma
+1. Post düzenleme implementasyonu
+2. Image upload (Firebase Storage)
 3. User profil sayfası
-4. Firestore security rules yazma
+4. Firestore security rules güncellemesi
 
 ---
 
-*Son güncelleme: Memory Bank oluşturuldu*
-
+*Son güncelleme: Post sabitleme sistemi ve admin özellikleri tamamlandı*

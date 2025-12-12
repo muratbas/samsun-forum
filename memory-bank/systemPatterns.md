@@ -1,4 +1,4 @@
-# Samsun Forum - Sistem Desenleri
+# OMÜForum - Sistem Desenleri
 
 ## Mimari Genel Bakış
 
@@ -37,12 +37,20 @@ RootLayout
 │       │   ├── NicknameModal
 │       │   └── CreatePostModal
 │       └── [Page Content]
-│           └── Home
+│           ├── Home (/)
+│           │   ├── LeftSidebar
+│           │   ├── MainContent
+│           │   │   ├── SortControls
+│           │   │   └── PostFeed
+│           │   │       └── PostCard (multiple)
+│           │   └── RightSidebar
+│           │       └── PinnedPosts
+│           └── PostDetail (/post/[id])
 │               ├── LeftSidebar
-│               ├── MainContent
-│               │   ├── SortControls
-│               │   └── PostFeed
-│               │       └── PostCard (multiple)
+│               ├── PostDetail
+│               │   ├── PostContent
+│               │   ├── CommentForm
+│               │   └── CommentList
 │               └── RightSidebar
 ```
 
@@ -115,7 +123,14 @@ interface ModalProps {
 }
 ```
 
-### 4. Compound Document ID
+### 4. Confirm Modal Pattern
+Silme ve kritik işlemler için özel onay modal'ı:
+- Ortada çıkan modal
+- İkon + başlık + mesaj
+- İptal ve Onayla butonları
+- Loading state desteği
+
+### 5. Compound Document ID
 Vote'lar için `userId_postId` formatında composite ID kullanılıyor. Bu sayede:
 - Tek bir kullanıcı bir post'a sadece bir kez oy verebilir
 - Vote kontrolü hızlı yapılabilir (doğrudan document ID ile)
@@ -124,7 +139,7 @@ Vote'lar için `userId_postId` formatında composite ID kullanılıyor. Bu sayed
 const voteId = `${userId}_${postId}` // "abc123_post456"
 ```
 
-### 5. Soft Delete
+### 6. Soft Delete
 Post'lar silindiğinde gerçekten silinmiyor, `deleted: true` olarak işaretleniyor.
 
 ```typescript
@@ -138,6 +153,13 @@ await updateDoc(postRef, {
 query(collection(db, 'posts'), where('deleted', '==', false))
 ```
 
+### 7. Post Pin System
+Admin'ler post'ları sabitleyebilir:
+- `pinned: boolean` alanı
+- `pinnedAt: Timestamp` alanı
+- RightSidebar'da gösterim
+- Pin/unpin fonksiyonları
+
 ## State Yönetimi
 
 ### Global State (Context)
@@ -147,10 +169,12 @@ query(collection(db, 'posts'), where('deleted', '==', false))
 | ThemeContext | theme | Dark/Light mode |
 
 ### Local State (Component)
-- `PostCard`: voteState, currentScore, voting
+- `PostCard`: voteState, currentScore, voting, showMenu, isPinned, pinning
 - `PostFeed`: posts, loading, error
+- `PostDetailPage`: post, comments, commentText, voteState, showMenu, isPinned
 - `SortControls`: activeSort
 - `Header`: showLoginModal, showNicknameModal, showCreatePostModal
+- `CreatePostModal`: title, content, selectedTopic, pinned, loading
 
 ## Veri Akışı
 
@@ -180,7 +204,7 @@ query(collection(db, 'posts'), where('deleted', '==', false))
    ↓
 2. CreatePostModal opens
    ↓
-3. User fills form (title, content, topic)
+3. User fills form (title, content, topic, pinned if admin)
    ↓
 4. createPost() - Firestore'a yaz
    ↓
@@ -189,9 +213,20 @@ query(collection(db, 'posts'), where('deleted', '==', false))
 6. Page refresh → getPosts() tekrar çalışır
 ```
 
+### Post Pin Flow
+```
+1. Admin clicks "Gönderiyi Sabitle" (three dots menu or create modal)
+   ↓
+2. pinPost() - Firestore'a yaz (pinned: true, pinnedAt: timestamp)
+   ↓
+3. RightSidebar otomatik güncellenir (getPinnedPosts)
+   ↓
+4. Post "Resmi Duyurular" bölümünde görünür
+```
+
 ### Voting Flow
 ```
-1. User clicks upvote/downvote
+1. User clicks thumbs up/down
    ↓
 2. Optimistic UI update
    ↓
@@ -208,30 +243,51 @@ query(collection(db, 'posts'), where('deleted', '==', false))
 7. Update user karma
 ```
 
-## Güvenlik Kuralları (Firestore - Planlanmış)
+### Comment Flow
+```
+1. User writes comment in PostDetailPage
+   ↓
+2. createComment() - Firestore'a yaz
+   ↓
+3. Post's commentCount increment
+   ↓
+4. Comments list refresh
+   ↓
+5. Comment appears in list
+```
+
+## Güvenlik Kuralları (Firestore)
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users - sadece kendi profilini okuyabilir/yazabilir
+    // Users
     match /users/{userId} {
       allow read: if true;
-      allow write: if request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Posts - giriş yapmış herkes yazabilir
+    // Posts
     match /posts/{postId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth.uid == resource.data.authorId;
+      allow update, delete: if request.auth != null && 
+        (request.auth.uid == resource.data.authorId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
     
-    // Votes - giriş yapmış herkes oy verebilir
+    // Comments
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.authorId;
+    }
+    
+    // Votes
     match /votes/{voteId} {
       allow read: if true;
-      allow write: if request.auth != null 
-                   && voteId.matches(request.auth.uid + '_.*');
+      allow write: if request.auth != null;
     }
   }
 }
@@ -259,4 +315,4 @@ const fetchUserData = async (firebaseUser, retryCount = 0) => {
 - Loading states (skeleton, spinner)
 - Error messages (kırmızı banner)
 - Success feedback (modal kapatma, page refresh)
-
+- Confirm modals (kritik işlemler için)

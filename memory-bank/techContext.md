@@ -1,4 +1,4 @@
-# Samsun Forum - Teknik Bağlam
+# OMÜForum - Teknik Bağlam
 
 ## Teknoloji Stack
 
@@ -21,8 +21,10 @@
 | Teknoloji | Kullanım |
 |-----------|----------|
 | date-fns | Tarih formatlama |
-| Material Symbols | Icon seti |
-| Plus Jakarta Sans | Font ailesi |
+| Hugeicons | Ana icon seti (CDN) |
+| Bootstrap Icons | Backup icon seti (CDN) |
+| Material Symbols | Backup icon seti (CDN) |
+| SF Pro Display | Custom font (local .otf files) |
 | ESLint | Kod kalitesi |
 | PostCSS | CSS işleme |
 
@@ -31,32 +33,39 @@
 ```
 samsun-forum/
 ├── app/                      # Next.js App Router
+│   ├── fonts/                # Custom font files (.otf)
 │   ├── globals.css           # Global stiller
-│   ├── layout.tsx            # Root layout + providers
-│   └── page.tsx              # Homepage
+│   ├── layout.tsx            # Root layout + providers + CDN links
+│   ├── page.tsx              # Homepage
+│   └── post/
+│       └── [id]/
+│           └── page.tsx      # Post detay sayfası
 ├── components/               # React componentleri
-│   ├── header.tsx            # Navbar
-│   ├── LeftSidebar.tsx       # Sol menü
-│   ├── RightSidebar.tsx      # Sağ panel (gündem, etkinlikler)
-│   ├── PostCard.tsx          # Tek post kartı
-│   ├── PostFeed.tsx          # Post listesi
-│   ├── SortControls.tsx      # Sıralama butonları
-│   ├── LoginModal.tsx        # Giriş popup
+│   ├── AdminBadge.tsx        # Admin badge component
+│   ├── ConfirmModal.tsx      # Onay modal'ı
+│   ├── CreatePostModal.tsx   # Yeni post popup
+│   ├── header.tsx             # Navbar
+│   ├── LeftSidebar.tsx       # Sol menü (fixed)
+│   ├── LoginModal.tsx         # Giriş popup
 │   ├── NicknameModal.tsx     # Nickname seçimi popup
-│   └── CreatePostModal.tsx   # Yeni post popup
+│   ├── PostCard.tsx           # Tek post kartı
+│   ├── PostFeed.tsx           # Post listesi
+│   ├── RightSidebar.tsx       # Sağ panel (static scroll)
+│   └── SortControls.tsx       # Sıralama butonları
 ├── contexts/                 # React Context'ler
-│   ├── AuthContext.tsx       # Authentication state
-│   └── ThemeContext.tsx      # Dark/Light mode
+│   ├── AuthContext.tsx        # Authentication state
+│   └── ThemeContext.tsx       # Dark/Light mode
 ├── lib/                      # Utility fonksiyonları
 │   ├── firebase.ts           # Firebase config
 │   ├── auth.ts               # Auth işlemleri
-│   ├── posts.ts              # Post CRUD
+│   ├── posts.ts              # Post CRUD + pin/unpin
+│   ├── comments.ts           # Comment CRUD
 │   ├── votes.ts              # Oylama işlemleri
 │   ├── topics.ts             # Topic tanımları
 │   └── linkify.tsx           # URL linkify
 ├── types/                    # TypeScript type tanımları
 │   └── index.ts
-├── memory-bank/              # Proje hafızası (bu dosyalar)
+├── memory-bank/              # Proje hafızası
 ├── package.json
 ├── tailwind.config.ts
 ├── tsconfig.json
@@ -91,8 +100,9 @@ samsun-forum/
   authorId: string       // User UID
   authorNickname: string
   authorPhotoURL: string
-  title: string
-  content?: string
+  authorRole?: 'user' | 'moderator' | 'admin'
+  title: string          // Max 50 karakter
+  content?: string       // Max 2000 karakter
   imageUrl?: string
   topicId: string
   topicName: string
@@ -100,9 +110,27 @@ samsun-forum/
   downvotes: number
   score: number          // upvotes - downvotes
   commentCount: number
+  pinned: boolean        // Admin tarafından sabitlendi mi?
+  pinnedAt?: Timestamp  // Sabitleme tarihi
   createdAt: Timestamp
   updatedAt: Timestamp
-  deleted: boolean       // Soft delete
+  deleted: boolean      // Soft delete
+}
+```
+
+#### `comments`
+```typescript
+{
+  id: string             // Document ID
+  postId: string         // Post ID
+  authorId: string       // User UID
+  authorNickname: string
+  authorPhotoURL: string
+  authorRole?: 'user' | 'moderator' | 'admin'
+  content: string
+  createdAt: Timestamp
+  updatedAt: Timestamp
+  deleted: boolean      // Soft delete
 }
 ```
 
@@ -158,10 +186,10 @@ npm run dev
 
 ```css
 /* Primary */
-primary: #E30613           /* Samsun kırmızısı */
+primary: #E30613           /* OMÜ kırmızısı */
 
 /* Light Mode */
-background-light: #F9F9F9
+background-light: #F4F8FB  /* Pastel açık mavi */
 surface-light: #FFFFFF
 text-primary-light: #111111
 text-secondary-light: #555555
@@ -178,9 +206,78 @@ border-dark: #3E3E3E
 accent: #4A90E2            /* Mavi vurgu (downvote) */
 ```
 
+## Icon Kullanımı
+
+### Hugeicons (Ana)
+```html
+<!-- CDN: app/layout.tsx -->
+<link href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" rel="stylesheet" />
+
+<!-- Kullanım -->
+<i className="hgi-stroke hgi-icon-name text-lg"></i>
+```
+
+### Bootstrap Icons (Backup)
+```html
+<!-- CDN: app/layout.tsx -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+<!-- Kullanım -->
+<i className="bi bi-icon-name text-lg"></i>
+```
+
+### Material Symbols (Backup)
+```html
+<!-- CDN: app/layout.tsx -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+<!-- Kullanım -->
+<span className="material-symbols-outlined">icon_name</span>
+```
+
+## Font Kullanımı
+
+### SF Pro Display (Custom)
+```typescript
+// app/layout.tsx
+const sfProDisplay = localFont({
+  src: [
+    { path: './fonts/sfprodisplayregular.otf', weight: '400' },
+    { path: './fonts/sfprodisplaymedium.otf', weight: '500' },
+    { path: './fonts/sfprodisplaybold.otf', weight: '700' },
+  ],
+  variable: '--font-sf-pro',
+})
+
+// tailwind.config.ts
+fontFamily: {
+  'sf-pro': ['var(--font-sf-pro)', 'sans-serif'],
+}
+
+// globals.css
+body {
+  font-family: var(--font-sf-pro), sans-serif;
+}
+```
+
 ## Bilinen Teknik Kısıtlamalar
 
 1. **Firestore Index Gereksinimi**: `posts` collection'ında `deleted` + `createdAt` veya `deleted` + `score` composite index gerekebilir
-2. **Offline Cache Sorunu**: Firestore offline cache bazen sorun çıkarıyor, `enableNetwork()` ile çözüldü
-3. **Firebase Ücretsiz Tier**: Günlük okuma/yazma limitleri var
+2. **Firebase Ücretsiz Tier**: Günlük okuma/yazma limitleri var
+3. **Image Upload**: Henüz aktif değil, Firebase Storage entegrasyonu gerekli
 
+## Önemli Notlar
+
+### Post Sabitleme
+- Sadece admin'ler post sabitleyebilir
+- `pinned: true` ve `pinnedAt: Timestamp` alanları kullanılıyor
+- RightSidebar'da maksimum 3 sabitlenmiş post gösteriliyor
+- `getPinnedPosts(limit)` fonksiyonu ile çekiliyor
+
+### Admin Yapma
+Firebase Console > Firestore > `users` collection'ında ilgili kullanıcının `role` alanını `"admin"` olarak değiştir.
+
+### Post Silme
+- Kullanıcılar sadece kendi postlarını silebilir
+- Admin'ler herhangi bir postu silebilir
+- Soft delete kullanılıyor (`deleted: true`)

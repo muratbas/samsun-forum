@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { getPost, deletePost } from '@/lib/posts'
+import { getPost, deletePost, pinPost, unpinPost } from '@/lib/posts'
 import { getCommentsByPost, createComment } from '@/lib/comments'
 import { upvotePost, downvotePost, getUserVote } from '@/lib/votes'
 import { Post, Comment } from '@/types'
@@ -36,10 +36,13 @@ export default function PostDetailPage() {
   const [showMenu, setShowMenu] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [isPinned, setIsPinned] = useState(false)
+  const [pinning, setPinning] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // Silme yetkisi kontrolü
   const canDelete = user && post && (user.uid === post.authorId || user.role === 'admin')
+  const canPin = user && user.role === 'admin'
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +52,7 @@ export default function PostDetailPage() {
         console.log('Post Data:', postData) // Debug
         setPost(postData)
         setCurrentScore(postData.score)
+        setIsPinned(postData.pinned || false)
         
         // Yorumları ayrı yükle
         try {
@@ -149,6 +153,29 @@ export default function PostDetailPage() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  const handlePin = async () => {
+    if (!user || user.role !== 'admin' || !post) return
+
+    try {
+      setPinning(true)
+      setShowMenu(false)
+      
+      if (isPinned) {
+        await unpinPost(post.id)
+        setIsPinned(false)
+        setPost({ ...post, pinned: false })
+      } else {
+        await pinPost(post.id)
+        setIsPinned(true)
+        setPost({ ...post, pinned: true })
+      }
+    } catch (error) {
+      console.error('Pin hatası:', error)
+    } finally {
+      setPinning(false)
+    }
+  }
 
   const handleDeleteClick = () => {
     setShowMenu(false)
@@ -314,6 +341,17 @@ export default function PostDetailPage() {
                 {/* Dropdown Menü */}
                 {showMenu && (
                   <div className="absolute right-0 mt-1 w-48 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark py-1 z-50">
+                    {/* Admin: Sabitle/Kaldır */}
+                    {canPin && (
+                      <button
+                        onClick={handlePin}
+                        disabled={pinning}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <i className={`hgi-stroke ${isPinned ? 'hgi-pin-off' : 'hgi-pin'} text-lg`}></i>
+                        {pinning ? 'İşleniyor...' : isPinned ? 'Sabitlemeyi Kaldır' : 'Gönderiyi Sabitle'}
+                      </button>
+                    )}
                     {canDelete && (
                       <button
                         onClick={handleDeleteClick}
@@ -323,7 +361,7 @@ export default function PostDetailPage() {
                         Gönderiyi Kaldır
                       </button>
                     )}
-                    {!canDelete && (
+                    {!canDelete && !canPin && (
                       <p className="px-4 py-2 text-sm text-text-secondary-light dark:text-text-secondary-dark">
                         Seçenek yok
                       </p>
@@ -391,6 +429,7 @@ export default function PostDetailPage() {
               {/* Paylaş */}
               <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                 <i className="hgi-stroke hgi-share-08 text-lg"></i>
+                <span>Paylaş</span>
               </button>
             </div>
           </div>

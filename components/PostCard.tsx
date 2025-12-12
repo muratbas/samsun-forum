@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { upvotePost, downvotePost, getUserVote } from '@/lib/votes'
-import { deletePost } from '@/lib/posts'
+import { deletePost, pinPost, unpinPost } from '@/lib/posts'
 import { Post } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -15,9 +15,10 @@ import ConfirmModal from './ConfirmModal'
 interface PostCardProps {
   post: Post
   onDelete?: () => void
+  onPinChange?: () => void
 }
 
-export default function PostCard({ post, onDelete }: PostCardProps) {
+export default function PostCard({ post, onDelete, onPinChange }: PostCardProps) {
   const router = useRouter()
   const { user } = useAuth()
   const [voteState, setVoteState] = useState<'upvote' | 'downvote' | null>(null)
@@ -26,6 +27,8 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
   const [showMenu, setShowMenu] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [isPinned, setIsPinned] = useState(post.pinned || false)
+  const [pinning, setPinning] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // Kullanıcının mevcut oyunu yükle
@@ -121,6 +124,32 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
     }
   }
 
+  const handlePin = async () => {
+    if (!user || user.role !== 'admin') return
+
+    try {
+      setPinning(true)
+      setShowMenu(false)
+      
+      if (isPinned) {
+        await unpinPost(post.id)
+        setIsPinned(false)
+      } else {
+        await pinPost(post.id)
+        setIsPinned(true)
+      }
+      
+      // Parent'a bildir
+      if (onPinChange) {
+        onPinChange()
+      }
+    } catch (error) {
+      console.error('Pin hatası:', error)
+    } finally {
+      setPinning(false)
+    }
+  }
+
   const handleDeleteClick = () => {
     setShowMenu(false)
     setShowConfirm(true)
@@ -195,6 +224,17 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
             {/* Dropdown Menü */}
             {showMenu && (
               <div className="absolute right-0 mt-1 w-48 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark py-1 z-50">
+                {/* Admin: Sabitle/Kaldır */}
+                {user?.role === 'admin' && (
+                  <button
+                    onClick={handlePin}
+                    disabled={pinning}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <i className={`hgi-stroke ${isPinned ? 'hgi-pin-off' : 'hgi-pin'} text-lg`}></i>
+                    {pinning ? 'İşleniyor...' : isPinned ? 'Sabitlemeyi Kaldır' : 'Gönderiyi Sabitle'}
+                  </button>
+                )}
                 {canDelete && (
                   <button
                     onClick={handleDeleteClick}
@@ -204,7 +244,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
                     Gönderiyi Kaldır
                   </button>
                 )}
-                {!canDelete && (
+                {!canDelete && user?.role !== 'admin' && (
                   <p className="px-4 py-2 text-sm text-text-secondary-light dark:text-text-secondary-dark">
                     Seçenek yok
                   </p>
@@ -283,6 +323,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
           {/* Paylaş */}
           <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
             <i className="hgi-stroke hgi-share-08 text-lg"></i>
+            <span>Paylaş</span>
           </button>
         </div>
       </div>

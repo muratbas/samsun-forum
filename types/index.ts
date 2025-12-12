@@ -31,6 +31,8 @@ export interface Post {
   downvotes: number
   score: number
   commentCount: number
+  pinned: boolean
+  pinnedAt?: Timestamp
   createdAt: Timestamp
   updatedAt: Timestamp
   deleted: boolean

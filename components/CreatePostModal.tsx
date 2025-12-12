@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { createPost } from '@/lib/posts'
 import { TOPICS, getTopicById } from '@/lib/topics'
@@ -16,8 +16,22 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [selectedTopic, setSelectedTopic] = useState('')
+  const [pinned, setPinned] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const isAdmin = user?.role === 'admin'
+
+  // Modal açıldığında formu sıfırla
+  useEffect(() => {
+    if (isOpen) {
+      setTitle('')
+      setContent('')
+      setSelectedTopic('')
+      setPinned(false)
+      setError('')
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -53,7 +67,8 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
         topicId,
         topicName,
         undefined, // imageUrl
-        user.role
+        user.role,
+        isAdmin ? pinned : false
       )
 
       // Formu temizle ve kapat
@@ -125,32 +140,59 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
             </p>
           </div>
 
-          {/* Konu Seçimi - Liste Formatı */}
+          {/* Konu Seçimi - Baloncuk/Tag Formatı */}
           <div>
             <label className="block text-sm font-bold mb-3">
-              Konu Seç <span className="text-text-secondary-dark font-normal">(Opsiyonel)</span>
+              Etiketler <span className="text-text-secondary-dark font-normal">(Opsiyonel)</span>
             </label>
-            <div className="flex flex-col gap-1 max-h-64 overflow-y-auto">
+            <div className="flex flex-wrap gap-2">
               {TOPICS.map((topic) => (
                 <button
                   key={topic.id}
                   type="button"
-                  onClick={() => setSelectedTopic(topic.id)}
+                  onClick={() => setSelectedTopic(selectedTopic === topic.id ? '' : topic.id)}
                   disabled={loading}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                     selectedTopic === topic.id
-                      ? 'bg-primary/10 text-primary'
-                      : 'hover:bg-black/5 dark:hover:bg-white/5'
+                      ? 'bg-primary text-white'
+                      : 'bg-surface-dark/80 text-text-primary-dark hover:bg-surface-dark'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  <span className="text-sm font-bold text-primary">#</span>
-                  <span className="text-sm font-bold leading-normal">
-                    {topic.name}
-                  </span>
+                  <span>{topic.name}</span>
+                  {selectedTopic === topic.id && (
+                    <span className="text-white/80 hover:text-white">✕</span>
+                  )}
                 </button>
               ))}
             </div>
+            <p className="text-xs text-text-secondary-dark mt-2">
+              e.g., traffic, help, news
+            </p>
           </div>
+
+          {/* Admin: Sabitle Toggle */}
+          {isAdmin && (
+            <div className="flex items-center justify-between p-3 bg-surface-dark/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <i className="hgi-stroke hgi-pin text-lg text-primary"></i>
+                <span className="text-sm font-medium">Resmi Duyuru Olarak Sabitle</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPinned(!pinned)}
+                disabled={loading}
+                className={`relative w-12 h-6 rounded-full transition-colors ${
+                  pinned ? 'bg-primary' : 'bg-border-dark'
+                }`}
+              >
+                <span
+                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    pinned ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          )}
 
           {/* Hata mesajı */}
           {error && (

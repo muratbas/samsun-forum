@@ -26,10 +26,11 @@ export const createPost = async (
   topicId: string,
   topicName: string,
   imageUrl?: string,
-  authorRole?: 'user' | 'moderator' | 'admin'
+  authorRole?: 'user' | 'moderator' | 'admin',
+  pinned?: boolean
 ) => {
   try {
-    const postData = {
+    const postData: any = {
       authorId,
       authorNickname,
       authorPhotoURL,
@@ -43,9 +44,15 @@ export const createPost = async (
       downvotes: 0,
       score: 0,
       commentCount: 0,
+      pinned: pinned || false,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       deleted: false,
+    }
+
+    // Eğer pinned ise pinnedAt ekle
+    if (pinned) {
+      postData.pinnedAt = serverTimestamp()
     }
 
     const docRef = await addDoc(collection(db, 'posts'), postData)
@@ -228,5 +235,57 @@ export const updatePostScore = async (postId: string, upvotes: number, downvotes
   } catch (error) {
     console.error('Post score güncelleme hatası:', error)
     throw error
+  }
+}
+
+// Post'u sabitle (sadece admin)
+export const pinPost = async (postId: string) => {
+  try {
+    await updateDoc(doc(db, 'posts', postId), {
+      pinned: true,
+      pinnedAt: serverTimestamp()
+    })
+    return true
+  } catch (error) {
+    console.error('Post sabitleme hatası:', error)
+    throw error
+  }
+}
+
+// Post sabitlemesini kaldır (sadece admin)
+export const unpinPost = async (postId: string) => {
+  try {
+    await updateDoc(doc(db, 'posts', postId), {
+      pinned: false,
+      pinnedAt: null
+    })
+    return true
+  } catch (error) {
+    console.error('Post sabitleme kaldırma hatası:', error)
+    throw error
+  }
+}
+
+// Sabitlenmiş postları getir
+export const getPinnedPosts = async (limitCount = 5) => {
+  try {
+    const q = query(
+      collection(db, 'posts'),
+      where('deleted', '==', false),
+      where('pinned', '==', true),
+      limit(limitCount)
+    )
+
+    const querySnapshot = await getDocs(q)
+    const posts: Post[] = []
+
+    querySnapshot.forEach((doc) => {
+      posts.push(Object.assign({ id: doc.id }, doc.data()) as Post)
+    })
+
+    return posts
+  } catch (error) {
+    console.error('Sabitlenmiş postları getirme hatası:', error)
+    return []
   }
 }
