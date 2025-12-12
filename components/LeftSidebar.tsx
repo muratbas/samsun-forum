@@ -13,28 +13,28 @@ export default function LeftSidebar() {
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary"
               href="/"
             >
-              <i className="bi bi-house-door-fill text-lg"></i>
+              <i className="bi bi-house-door text-lg"></i>
               <span className="text-sm font-medium">Anasayfa</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/popular"
             >
-              <i className="bi bi-star-fill text-lg"></i>
+              <i className="bi bi-star text-lg"></i>
               <span className="text-sm font-normal">Popüler</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/fresh"
             >
-              <i className="bi bi-lightning-fill text-lg"></i>
+              <i className="bi bi-lightning text-lg"></i>
               <span className="text-sm font-normal">Taze</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/subscriptions"
             >
-              <i className="bi bi-rss-fill text-lg"></i>
+              <i className="bi bi-rss text-lg"></i>
               <span className="text-sm font-normal">Aboneliklerim</span>
             </a>
           </nav>
@@ -50,14 +50,14 @@ export default function LeftSidebar() {
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/notes"
             >
-              <i className="bi bi-journal-bookmark-fill text-lg"></i>
+              <i className="bi bi-journal-bookmark text-lg"></i>
               <span className="text-sm font-normal">Not Bankası</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/professors"
             >
-              <i className="bi bi-mortarboard-fill text-lg"></i>
+              <i className="bi bi-mortarboard text-lg"></i>
               <span className="text-sm font-normal">Hoca Değerlendirmeleri</span>
             </a>
           </nav>
@@ -80,52 +80,22 @@ export default function LeftSidebar() {
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/clubs"
             >
-              <i className="bi bi-people-fill text-lg"></i>
+              <i className="bi bi-people text-lg"></i>
               <span className="text-sm font-normal">Kulüpler & Topluluklar</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/events"
             >
-              <i className="bi bi-calendar-event-fill text-lg"></i>
+              <i className="bi bi-calendar-event text-lg"></i>
               <span className="text-sm font-normal">Etkinlik Takvimi</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/cafeteria"
             >
-              <i className="bi bi-cup-hot-fill text-lg"></i>
+              <i className="bi bi-cup-hot text-lg"></i>
               <span className="text-sm font-normal">Yemekhane Menüsü</span>
-            </a>
-          </nav>
-        </div>
-
-        {/* Marketplace / Pazar Yeri */}
-        <div className="mb-4">
-          <h3 className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider px-3 py-2">
-            Pazar Yeri
-          </h3>
-          <nav className="flex flex-col gap-0.5">
-            <a
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              href="/marketplace/books"
-            >
-              <i className="bi bi-book-half text-lg"></i>
-              <span className="text-sm font-normal">İkinci El Kitaplar</span>
-            </a>
-            <a
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              href="/marketplace/housing"
-            >
-              <i className="bi bi-house-door-fill text-lg"></i>
-              <span className="text-sm font-normal">Yurt / Ev</span>
-            </a>
-            <a
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              href="/marketplace/lost-found"
-            >
-              <i className="bi bi-search-heart text-lg"></i>
-              <span className="text-sm font-normal">Kayıp & Bulundu</span>
             </a>
           </nav>
         </div>

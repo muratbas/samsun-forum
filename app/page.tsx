@@ -38,11 +38,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Sağ Sidebar - Sticky */}
+            {/* Sağ Sidebar - Static (scrolls with page) */}
             <div className="hidden lg:block w-80 flex-shrink-0">
-              <div className="sticky top-20">
-                <RightSidebar />
-              </div>
+              <RightSidebar />
             </div>
           </div>
         </div>
