@@ -24,7 +24,8 @@ const config: Config = {
         'accent': '#4A90E2',
       },
       fontFamily: {
-        display: ['Plus Jakarta Sans', 'sans-serif'],
+        'sf-pro': ['var(--font-sf-pro)', 'SF Pro Display', 'sans-serif'],
+        display: ['var(--font-sf-pro)', 'SF Pro Display', 'sans-serif'],
       },
     },
   },

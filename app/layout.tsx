@@ -1,15 +1,31 @@
 import type { Metadata } from 'next'
-import { Plus_Jakarta_Sans } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import Header from '@/components/header'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 
-// Google Font'u yükle
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-display',
+// SF Pro Display Font
+const sfProDisplay = localFont({
+  src: [
+    {
+      path: './fonts/sfprodisplayregular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/sfprodisplaymedium.otf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: './fonts/sfprodisplaybold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-sf-pro',
+  display: 'swap',
 })
 
 // Sayfa meta bilgileri (SEO için)
@@ -32,8 +48,13 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
           rel="stylesheet"
         />
+        {/* Bootstrap Icons */}
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet"
+        />
       </head>
-      <body className={plusJakartaSans.variable}>
+      <body className={`${sfProDisplay.variable} font-sf-pro`}>
         <ThemeProvider>
           <AuthProvider>
             <div className="relative flex min-h-screen w-full flex-col">
