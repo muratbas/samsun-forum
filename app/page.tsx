@@ -10,7 +10,6 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<'new' | 'hot' | 'top'>('hot')
 
   const handleSortChange = (sort: 'popular' | 'new' | 'top') => {
-    // 'popular' ve 'top' ikisi de 'top' (en yüksek score) olarak çalışacak
     if (sort === 'popular' || sort === 'top') {
       setSortBy('top')
     } else {
@@ -19,25 +18,35 @@ export default function Home() {
   }
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-12 gap-8">
-        {/* Sol Sidebar */}
-        <LeftSidebar />
+    <div className="flex min-h-screen">
+      {/* Sol Sidebar - Fixed */}
+      <LeftSidebar />
 
-        {/* Ana Feed - Ortada */}
-        <div className="col-span-12 lg:col-span-6">
-          <div className="flex flex-col gap-4">
-            {/* Sıralama Kontrolleri */}
-            <SortControls onSortChange={handleSortChange} />
+      {/* Ana İçerik Alanı */}
+      <main className="flex-1 lg:ml-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex gap-6">
+            
+            {/* Ana Feed - Sol */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col gap-4">
+                {/* Sıralama Kontrolleri */}
+                <SortControls onSortChange={handleSortChange} />
 
-            {/* Post Feed */}
-            <PostFeed sortBy={sortBy} />
+                {/* Post Feed */}
+                <PostFeed sortBy={sortBy} />
+              </div>
+            </div>
+
+            {/* Sağ Sidebar - Sticky */}
+            <div className="hidden lg:block w-80 flex-shrink-0">
+              <div className="sticky top-20">
+                <RightSidebar />
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Sağ Sidebar */}
-        <RightSidebar />
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }

@@ -62,17 +62,19 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 sm:px-6 lg:px-8 py-3">
       {/* Logo ve Marka */}
-      <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-        <span className="material-symbols-outlined text-primary text-3xl">
-          forum
-        </span>
+      <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <img 
+          src="/omu-logo.png" 
+          alt="OMÜ Logo" 
+          className="w-9 h-9 rounded-full object-cover"
+        />
         {/* Desktop'ta tam isim */}
         <h1 className="text-xl font-bold tracking-tight hidden sm:block">
-          Samsun Forum
+          OMÜForum
         </h1>
         {/* Mobile'da kısa */}
         <h1 className="text-xl font-bold tracking-tight sm:hidden">
-          SF
+          OMÜ
         </h1>
       </a>
 
@@ -85,7 +87,7 @@ export default function Header() {
             </div>
             <input
               className="form-input flex w-full min-w-0 flex-1 text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-surface-light dark:bg-surface-dark h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-4 pl-2 text-base"
-              placeholder="Samsun'da Ara..."
+              placeholder="OMÜ'de Ara..."
               type="text"
             />
           </div>

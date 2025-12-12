@@ -14,9 +14,9 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 // Sayfa meta bilgileri (SEO için)
 export const metadata: Metadata = {
-  title: 'Samsun Forum - Samsunun Dijital Meydanı',
-  description: 'Samsun için hyper-local forum platformu. Şehir sakinlerinin buluşma noktası.',
-  keywords: ['samsun', 'forum', 'samsun forum', 'samsunspor', 'samsun etkinlik'],
+  title: 'OMÜForum - Ondokuz Mayıs Üniversitesi Öğrenci Forumu',
+  description: 'OMÜ öğrencilerinin dijital buluşma noktası. Not paylaşımı, etkinlikler, itiraflar ve daha fazlası.',
+  keywords: ['omü', 'omu', 'ondokuz mayıs üniversitesi', 'forum', 'öğrenci', 'samsun', 'üniversite'],
 }
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="tr">
+    <html lang="tr" className="dark">
       <head>
         {/* Material Symbols iconlarını yükle */}
         <link
