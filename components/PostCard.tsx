@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { upvotePost, downvotePost, getUserVote } from '@/lib/votes'
 import { Post } from '@/types'
@@ -13,6 +14,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const router = useRouter()
   const { user } = useAuth()
   const [voteState, setVoteState] = useState<'upvote' | 'downvote' | null>(null)
   const [currentScore, setCurrentScore] = useState(post.score)
@@ -136,10 +138,13 @@ export default function PostCard({ post }: PostCardProps) {
         </button>
       </div>
 
-      {/* İçerik */}
-      <div className="mb-3">
+      {/* İçerik - Tıklanabilir */}
+      <div 
+        className="mb-3 cursor-pointer"
+        onClick={() => router.push(`/post/${post.id}`)}
+      >
         {/* Başlık */}
-        <h3 className="text-base font-semibold leading-snug mb-2 hover:text-primary cursor-pointer">
+        <h3 className="text-base font-semibold leading-snug mb-2 hover:text-primary">
           <Linkify text={post.title} />
         </h3>
 
@@ -191,9 +196,12 @@ export default function PostCard({ post }: PostCardProps) {
         </button>
 
         {/* Yorum */}
-        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+        <button 
+          onClick={() => router.push(`/post/${post.id}`)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        >
           <span className="material-symbols-outlined text-lg">chat_bubble_outline</span>
-          <span>{post.commentCount} comments</span>
+          <span>{post.commentCount} yorum</span>
         </button>
 
         {/* Paylaş */}

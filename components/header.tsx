@@ -82,11 +82,11 @@ export default function Header() {
       <div className="hidden md:flex flex-1 justify-center px-8">
         <label className="flex flex-col w-full max-w-lg h-10">
           <div className="flex w-full items-stretch rounded-lg h-full border border-border-light dark:border-border-dark overflow-hidden">
-            <div className="text-text-secondary-light dark:text-text-secondary-dark flex bg-background-light dark:bg-background-dark items-center justify-center pl-4">
+            <div className="text-text-secondary-light dark:text-text-secondary-dark flex bg-surface-light dark:bg-surface-dark items-center justify-center pl-4">
               <span className="material-symbols-outlined">search</span>
             </div>
             <input
-              className="form-input flex w-full min-w-0 flex-1 text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-background-light dark:bg-background-dark h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-4 pl-2 text-base"
+              className="form-input flex w-full min-w-0 flex-1 text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-surface-light dark:bg-surface-dark h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-4 pl-2 text-base"
               placeholder="OMÜ'de Ara..."
               type="text"
             />

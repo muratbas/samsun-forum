@@ -57,6 +57,19 @@ export interface Vote {
   createdAt: Timestamp
 }
 
+// Yorum tipi
+export interface Comment {
+  id: string
+  postId: string
+  authorId: string
+  authorNickname: string
+  authorPhotoURL: string
+  content: string
+  createdAt: Timestamp
+  updatedAt: Timestamp
+  deleted: boolean
+}
+
 // Etkinlik tipi
 export interface Event {
   id: string
