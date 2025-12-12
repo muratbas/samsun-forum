@@ -182,7 +182,7 @@ export default function RightSidebar() {
           </div>
           
           <p className="font-display font-medium text-sm leading-relaxed mb-6 italic text-text-primary-light dark:text-text-primary-dark">
-            "{quote}"
+            &quot;{quote}&quot;
           </p>
           
           <div className="relative w-40 h-16 mt-auto opacity-100">

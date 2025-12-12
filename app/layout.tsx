@@ -45,7 +45,7 @@ export default function RootLayout({
       <head>
         {/* Material Symbols iconlarını yükle */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=optional"
           rel="stylesheet"
         />
         {/* Bootstrap Icons */}

@@ -208,7 +208,7 @@ export default function EventsPage() {
               Samsun Etkinlik Takvimi
             </h1>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">
-              Samsun'daki etkinlikleri görüntüle, filtrele ve takvime ekle.
+              Samsun&apos;daki etkinlikleri görüntüle, filtrele ve takvime ekle.
             </p>
           </div>
           
