@@ -94,7 +94,7 @@ export default function PostFeed({ sortBy = 'popular' }: PostFeedProps) {
           <span className="material-symbols-outlined text-6xl text-text-secondary-dark mb-4">search_off</span>
           <h3 className="text-xl font-bold mb-2">Sonuç bulunamadı</h3>
           <p className="text-text-secondary-light dark:text-text-secondary-dark">
-            "{searchQuery}" için herhangi bir gönderi bulamadık.
+            &quot;{searchQuery}&quot; için herhangi bir gönderi bulamadık.
           </p>
         </div>
       )
@@ -122,7 +122,7 @@ export default function PostFeed({ sortBy = 'popular' }: PostFeedProps) {
       {searchQuery && (
         <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60 mb-2">
           <p className="text-sm font-medium">
-            <span className="text-primary">"{searchQuery}"</span> için arama sonuçları ({posts.length}):
+            <span className="text-primary">&quot;{searchQuery}&quot;</span> için arama sonuçları ({posts.length}):
           </p>
         </div>
       )}
