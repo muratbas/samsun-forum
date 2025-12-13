@@ -398,7 +398,7 @@ export default function PostDetailPage() {
 
             {/* İçerik */}
             {post.content && (
-              <p className="text-text-primary-light dark:text-text-primary-dark text-base leading-relaxed mb-4 break-words">
+              <p className="text-text-primary-light dark:text-text-primary-dark text-base leading-relaxed mb-4 break-words whitespace-pre-wrap">
                 <Linkify text={post.content} />
               </p>
             )}

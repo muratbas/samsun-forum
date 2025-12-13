@@ -266,7 +266,7 @@ export default function PostCard({ post, onDelete, onPinChange }: PostCardProps)
 
           {/* İçerik */}
           {post.content && (
-            <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-relaxed line-clamp-3 break-words">
+            <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-relaxed line-clamp-3 break-words whitespace-pre-wrap">
               <Linkify text={post.content} />
             </p>
           )}

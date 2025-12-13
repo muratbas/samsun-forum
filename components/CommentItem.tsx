@@ -166,7 +166,7 @@ export default function CommentItem({ comment, currentUser, onDelete }: CommentI
           )}
         </div>
         
-        <p className="text-text-primary-light dark:text-text-primary-dark text-sm whitespace-pre-wrap word-break-break-word mb-2">
+        <p className="text-text-primary-light dark:text-text-primary-dark text-sm whitespace-pre-wrap break-words mb-2">
           {comment.content}
         </p>
 
