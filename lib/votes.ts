@@ -14,6 +14,7 @@ import {
 import { db } from './firebase'
 import { Vote } from '@/types'
 import { updatePostScore } from './posts'
+import { updateCommentScore } from './comments'
 
 // Kullanıcının bir post için oyunu getir
 export const getUserVote = async (userId: string, postId: string): Promise<'upvote' | 'downvote' | null> => {
@@ -33,7 +34,7 @@ export const getUserVote = async (userId: string, postId: string): Promise<'upvo
   }
 }
 
-// Upvote
+// Upvote Post
 export const upvotePost = async (userId: string, postId: string) => {
   try {
     const voteId = `${userId}_${postId}`
@@ -47,10 +48,7 @@ export const upvotePost = async (userId: string, postId: string) => {
       // Zaten upvote atmış, kaldır
       await deleteDoc(voteRef)
       
-      // Post'un karma değerini güncelle
-      await updateDoc(doc(db, 'users', userId), {
-        karma: increment(-1)
-      })
+      // Karma güncellemesi kaldırıldı
       
       // Post'un upvote sayısını azalt
       const postDoc = await getDoc(doc(db, 'posts', postId))
@@ -69,10 +67,7 @@ export const upvotePost = async (userId: string, postId: string) => {
         createdAt: serverTimestamp()
       })
       
-      // Karma +2 (downvote kaldır +1, upvote ekle +1)
-      await updateDoc(doc(db, 'users', userId), {
-        karma: increment(2)
-      })
+      // Karma güncellemesi kaldırıldı
       
       // Post'un vote sayılarını güncelle
       const postDoc = await getDoc(doc(db, 'posts', postId))
@@ -91,10 +86,7 @@ export const upvotePost = async (userId: string, postId: string) => {
         createdAt: serverTimestamp()
       })
       
-      // Karma +1
-      await updateDoc(doc(db, 'users', userId), {
-        karma: increment(1)
-      })
+      // Karma güncellemesi kaldırıldı
       
       // Post'un upvote sayısını artır
       const postDoc = await getDoc(doc(db, 'posts', postId))
@@ -111,7 +103,7 @@ export const upvotePost = async (userId: string, postId: string) => {
   }
 }
 
-// Downvote
+// Downvote Post
 export const downvotePost = async (userId: string, postId: string) => {
   try {
     const voteId = `${userId}_${postId}`
@@ -125,9 +117,6 @@ export const downvotePost = async (userId: string, postId: string) => {
       // Zaten downvote atmış, kaldır
       await deleteDoc(voteRef)
       
-      // Karma değişmez (downvote kaldırılınca etki yok)
-      
-      // Post'un downvote sayısını azalt
       const postDoc = await getDoc(doc(db, 'posts', postId))
       if (postDoc.exists()) {
         const post = postDoc.data()
@@ -144,12 +133,8 @@ export const downvotePost = async (userId: string, postId: string) => {
         createdAt: serverTimestamp()
       })
       
-      // Karma -1 (upvote kaldır)
-      await updateDoc(doc(db, 'users', userId), {
-        karma: increment(-1)
-      })
+      // Karma güncellemesi kaldırıldı
       
-      // Post'un vote sayılarını güncelle
       const postDoc = await getDoc(doc(db, 'posts', postId))
       if (postDoc.exists()) {
         const post = postDoc.data()
@@ -166,9 +151,6 @@ export const downvotePost = async (userId: string, postId: string) => {
         createdAt: serverTimestamp()
       })
       
-      // Karma değişmez (downvote karma etkilemez)
-      
-      // Post'un downvote sayısını artır
       const postDoc = await getDoc(doc(db, 'posts', postId))
       if (postDoc.exists()) {
         const post = postDoc.data()
@@ -183,7 +165,98 @@ export const downvotePost = async (userId: string, postId: string) => {
   }
 }
 
-// Kullanıcının tüm oylarını getir (opsiyonel - profil sayfası için)
+// Kullanıcının bir yorum için oyunu getir
+export const getUserCommentVote = async (userId: string, commentId: string): Promise<'upvote' | 'downvote' | null> => {
+  try {
+    const voteId = `${userId}_${commentId}`
+    const voteDoc = await getDoc(doc(db, 'comment_votes', voteId))
+    
+    if (voteDoc.exists()) {
+      const vote = voteDoc.data() as { type: 'upvote' | 'downvote' }
+      return vote.type
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Yorum oyu getirme hatası:', error)
+    return null
+  }
+}
+
+// Upvote Comment
+export const upvoteComment = async (userId: string, commentId: string) => {
+  try {
+    const voteId = `${userId}_${commentId}`
+    const voteRef = doc(db, 'comment_votes', voteId)
+    const voteDoc = await getDoc(voteRef)
+    
+    const existingVote = voteDoc.exists() ? (voteDoc.data() as { type: 'upvote' | 'downvote' }).type : null
+    
+    // Yorumun mevcut skorunu al
+    const commentRef = doc(db, 'comments', commentId)
+    const commentDoc = await getDoc(commentRef)
+    if (!commentDoc.exists()) throw new Error('Yorum bulunamadı')
+    const currentScore = commentDoc.data().score || 0
+
+    if (existingVote === 'upvote') {
+      // Kaldır
+      await deleteDoc(voteRef)
+      await updateCommentScore(commentId, currentScore - 1)
+      return { type: null, changed: true }
+    } else if (existingVote === 'downvote') {
+      // Değiştir
+      await setDoc(voteRef, { userId, commentId, type: 'upvote', createdAt: serverTimestamp() })
+      await updateCommentScore(commentId, currentScore + 2)
+      return { type: 'upvote', changed: true }
+    } else {
+      // Yeni
+      await setDoc(voteRef, { userId, commentId, type: 'upvote', createdAt: serverTimestamp() })
+      await updateCommentScore(commentId, currentScore + 1)
+      return { type: 'upvote', changed: true }
+    }
+  } catch (error) {
+    console.error('Comment Upvote hatası:', error)
+    throw error
+  }
+}
+
+// Downvote Comment
+export const downvoteComment = async (userId: string, commentId: string) => {
+  try {
+    const voteId = `${userId}_${commentId}`
+    const voteRef = doc(db, 'comment_votes', voteId)
+    const voteDoc = await getDoc(voteRef)
+    
+    const existingVote = voteDoc.exists() ? (voteDoc.data() as { type: 'upvote' | 'downvote' }).type : null
+    
+    const commentRef = doc(db, 'comments', commentId)
+    const commentDoc = await getDoc(commentRef)
+    if (!commentDoc.exists()) throw new Error('Yorum bulunamadı')
+    const currentScore = commentDoc.data().score || 0
+
+    if (existingVote === 'downvote') {
+      // Kaldır
+      await deleteDoc(voteRef)
+      await updateCommentScore(commentId, currentScore + 1)
+      return { type: null, changed: true }
+    } else if (existingVote === 'upvote') {
+      // Değiştir
+      await setDoc(voteRef, { userId, commentId, type: 'downvote', createdAt: serverTimestamp() })
+      await updateCommentScore(commentId, currentScore - 2)
+      return { type: 'downvote', changed: true }
+    } else {
+      // Yeni
+      await setDoc(voteRef, { userId, commentId, type: 'downvote', createdAt: serverTimestamp() })
+      await updateCommentScore(commentId, currentScore - 1)
+      return { type: 'downvote', changed: true }
+    }
+  } catch (error) {
+    console.error('Comment Downvote hatası:', error)
+    throw error
+  }
+}
+
+// Kullanıcının tüm oylarını getir
 export const getUserVotes = async (userId: string) => {
   try {
     const q = query(
@@ -205,4 +278,3 @@ export const getUserVotes = async (userId: string) => {
     return {}
   }
 }
-

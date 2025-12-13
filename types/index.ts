@@ -72,6 +72,7 @@ export interface Comment {
   createdAt: Timestamp
   updatedAt: Timestamp
   deleted: boolean
+  score?: number
 }
 
 // Etkinlik tipi

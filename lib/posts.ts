@@ -132,9 +132,8 @@ export const getPostsByTopic = async (topicId: string, limitCount = 50) => {
     const q = query(
       collection(db, 'posts'),
       where('topicId', '==', topicId),
-      where('deleted', '==', false),
-      orderBy('createdAt', 'desc'),
-      limit(limitCount)
+      where('deleted', '==', false)
+      // Index gerektirmemesi için orderBy'ı kaldırdık, client-side sıralayacağız
     )
 
     const querySnapshot = await getDocs(q)
@@ -142,6 +141,12 @@ export const getPostsByTopic = async (topicId: string, limitCount = 50) => {
 
     querySnapshot.forEach((doc) => {
       posts.push(Object.assign({ id: doc.id }, doc.data()) as Post)
+    })
+
+    // Client-side sıralama (Yeniden eskiye)
+    posts.sort((a, b) => {
+      if (!a.createdAt || !b.createdAt) return 0
+      return b.createdAt.toMillis() - a.createdAt.toMillis()
     })
 
     return posts

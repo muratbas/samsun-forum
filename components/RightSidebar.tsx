@@ -5,6 +5,7 @@ import { getPinnedPosts } from '@/lib/posts'
 import { getUpcomingEvents } from '@/lib/events'
 import { getRandomQuote } from '@/lib/ataturkQuotes'
 import { getCurrentWeather, WeatherData } from '@/lib/weather'
+import { TOPICS } from '@/lib/topics'
 import { Post, Event } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -18,18 +19,12 @@ export default function RightSidebar() {
   const [quote, setQuote] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // Mock data - Manuel Gündem Başlıkları
-  const trendingTopics = [
-    '#FinalHaftası', '#Sınav', '#Yemekhane', 
-    '#Kulüpler', '#Etkinlik', '#Kampüs'
-  ]
-
   useEffect(() => {
     const loadData = async () => {
       try {
         const [postsData, eventsData, weatherData] = await Promise.all([
           getPinnedPosts(3),
-          getUpcomingEvents(5), // Bugün + 4 gelecek etkinlik çekelim
+          getUpcomingEvents(5), 
           getCurrentWeather()
         ])
         setPinnedPosts(postsData)
@@ -123,13 +118,14 @@ export default function RightSidebar() {
       <div className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 border border-border-light/60 dark:border-border-dark/60">
         <h3 className="font-bold text-sm mb-3">Gündem Başlıkları</h3>
         <div className="flex flex-wrap gap-2">
-          {trendingTopics.map((topic, index) => (
+          {TOPICS.filter(t => t.id !== 'genel').map((topic) => (
             <Link 
-              key={index} 
-              href={`/topic/${topic.replace('#', '')}`}
-              className="text-xs font-medium px-3 py-1.5 bg-background-light dark:bg-white/5 rounded-full text-text-secondary-light dark:text-text-secondary-dark hover:bg-primary/10 hover:text-primary transition-colors"
+              key={topic.id} 
+              href={`/gundem/${topic.slug}`}
+              className="text-xs font-medium px-3 py-1.5 bg-background-light dark:bg-white/5 rounded-full text-text-secondary-light dark:text-text-secondary-dark hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1.5"
             >
-              {topic}
+              <span className="opacity-70">#</span>
+              {topic.name}
             </Link>
           ))}
         </div>

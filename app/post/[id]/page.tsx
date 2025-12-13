@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { getPost, deletePost, pinPost, unpinPost } from '@/lib/posts'
-import { getCommentsByPost, createComment } from '@/lib/comments'
+import { getCommentsByPost, createComment, deleteComment } from '@/lib/comments'
 import { upvotePost, downvotePost, getUserVote } from '@/lib/votes'
 import { Post, Comment } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
@@ -14,6 +14,7 @@ import LeftSidebar from '@/components/LeftSidebar'
 import RightSidebar from '@/components/RightSidebar'
 import AdminBadge from '@/components/AdminBadge'
 import ConfirmModal from '@/components/ConfirmModal'
+import CommentItem from '@/components/CommentItem'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -47,9 +48,7 @@ export default function PostDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Post ID:', postId) // Debug
         const postData = await getPost(postId)
-        console.log('Post Data:', postData) // Debug
         setPost(postData)
         setCurrentScore(postData.score)
         setIsPinned(postData.pinned || false)
@@ -237,6 +236,26 @@ export default function PostDetailPage() {
     }
   }
 
+  // Yorum silme işleyicisi
+  const handleCommentDelete = async (commentId: string) => {
+    if (!window.confirm('Bu yorumu silmek istediğinize emin misiniz?')) return
+
+    try {
+      await deleteComment(commentId, postId)
+      
+      // Listeden çıkar
+      setComments(prev => prev.filter(c => c.id !== commentId))
+      
+      // Post yorum sayısını güncelle
+      if (post) {
+        setPost({ ...post, commentCount: Math.max(0, post.commentCount - 1) })
+      }
+    } catch (error) {
+      console.error('Yorum silme hatası:', error)
+      alert('Yorum silinemedi.')
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen">
@@ -323,7 +342,7 @@ export default function PostDetailPage() {
                   <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">•</span>
                   <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">{timeAgo}</span>
                   <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">•</span>
-                  <a href={`/topic/${post.topicId}`} className="text-primary font-semibold text-xs hover:underline">
+                  <a href={`/gundem/${post.topicId}`} className="text-primary font-semibold text-xs hover:underline">
                     #{post.topicName}
                   </a>
                 </div>
@@ -482,7 +501,12 @@ export default function PostDetailPage() {
             ) : (
               <div className="space-y-4">
                 {comments.map((comment) => (
-                  <CommentItem key={comment.id} comment={comment} />
+                  <CommentItem 
+                    key={comment.id} 
+                    comment={comment} 
+                    currentUser={user} 
+                    onDelete={handleCommentDelete} 
+                  />
                 ))}
               </div>
             )}
@@ -511,36 +535,3 @@ export default function PostDetailPage() {
     </div>
   )
 }
-
-// Yorum komponenti
-function CommentItem({ comment }: { comment: Comment }) {
-  const timeAgo = comment.createdAt
-    ? formatDistanceToNow(comment.createdAt.toDate(), { addSuffix: true, locale: tr })
-    : 'az önce'
-
-  return (
-    <div className="flex gap-3">
-      <div 
-        className="w-8 h-8 rounded-full bg-center bg-cover bg-no-repeat bg-gray-400 flex-shrink-0"
-        style={{ backgroundImage: comment.authorPhotoURL ? `url("${comment.authorPhotoURL}")` : 'none' }}
-      >
-        {!comment.authorPhotoURL && (
-          <div className="w-full h-full flex items-center justify-center text-white text-xs font-bold rounded-full bg-primary">
-            {comment.authorNickname.charAt(0).toUpperCase()}
-          </div>
-        )}
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-semibold text-sm">{comment.authorNickname}</span>
-          {comment.authorRole === 'admin' && <AdminBadge />}
-          <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">{timeAgo}</span>
-        </div>
-        <p className="text-text-primary-light dark:text-text-primary-dark text-sm">
-          {comment.content}
-        </p>
-      </div>
-    </div>
-  )
-}
-

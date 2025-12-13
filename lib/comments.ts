@@ -5,10 +5,11 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
   serverTimestamp,
   increment,
-  updateDoc
+  updateDoc,
+  deleteDoc,
+  getDoc
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { Comment } from '@/types'
@@ -33,6 +34,7 @@ export const createComment = async (
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       deleted: false,
+      score: 0,
     }
 
     const docRef = await addDoc(collection(db, 'comments'), commentData)
@@ -70,7 +72,9 @@ export const getCommentsByPost = async (postId: string) => {
 
     // Client-side sıralama
     comments.sort((a, b) => {
-      if (!a.createdAt || !b.createdAt) return 0
+      // Eğer timestamp henüz oluşmadıysa (lokal cache), sona at
+      if (!a.createdAt) return 1
+      if (!b.createdAt) return -1
       return a.createdAt.toMillis() - b.createdAt.toMillis()
     })
 
@@ -81,3 +85,37 @@ export const getCommentsByPost = async (postId: string) => {
   }
 }
 
+// Yorumu sil (Soft delete)
+export const deleteComment = async (commentId: string, postId: string) => {
+  try {
+    // 1. Yorumu deleted olarak işaretle
+    await updateDoc(doc(db, 'comments', commentId), {
+      deleted: true
+    })
+
+    // 2. Post'un yorum sayısını azalt
+    await updateDoc(doc(db, 'posts', postId), {
+      commentCount: increment(-1)
+    })
+    
+    return true
+  } catch (error) {
+    console.error('Yorum silme hatası:', error)
+    throw error
+  }
+}
+
+// Yorum skorunu güncelle
+export const updateCommentScore = async (
+  commentId: string, 
+  score: number
+) => {
+  try {
+    await updateDoc(doc(db, 'comments', commentId), {
+      score: score
+    })
+  } catch (error) {
+    console.error('Yorum skoru güncelleme hatası:', error)
+    throw error
+  }
+}

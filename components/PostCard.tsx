@@ -206,7 +206,7 @@ export default function PostCard({ post, onDelete, onPinChange }: PostCardProps)
               <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">•</span>
               <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">{timeAgo}</span>
               <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs">•</span>
-              <a href={`/topic/${post.topicId}`} className="text-primary font-semibold text-xs hover:underline">
+              <a href={`/gundem/${post.topicId}`} className="text-primary font-semibold text-xs hover:underline">
                 #{post.topicName}
               </a>
             </div>
