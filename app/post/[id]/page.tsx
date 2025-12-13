@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { getPost, deletePost, pinPost, unpinPost } from '@/lib/posts'
 import { getCommentsByPost, createComment, deleteComment } from '@/lib/comments'
@@ -485,7 +486,7 @@ export default function PostDetailPage() {
               </form>
             ) : (
               <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">
-                Yorum yapmak için <a href="#" className="text-primary font-semibold hover:underline">giriş yap</a>.
+                Yorum yapmak için <Link href="/login" className="text-primary font-semibold hover:underline">giriş yap</Link>.
               </p>
             )}
           </div>
