@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import LeftSidebar from '@/components/LeftSidebar'
 import RightSidebar from '@/components/RightSidebar'
 import SortControls from '@/components/SortControls'
@@ -30,7 +30,15 @@ export default function Home() {
                 <SortControls onSortChange={handleSortChange} />
 
                 {/* Post Feed */}
-                <PostFeed sortBy={sortBy} />
+                <Suspense fallback={
+                  <div className="flex flex-col gap-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-surface-light dark:bg-surface-dark rounded-xl p-4 animate-pulse h-40"></div>
+                    ))}
+                  </div>
+                }>
+                  <PostFeed sortBy={sortBy} />
+                </Suspense>
               </div>
             </div>
 
