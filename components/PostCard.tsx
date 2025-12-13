@@ -29,7 +29,9 @@ export default function PostCard({ post, onDelete, onPinChange }: PostCardProps)
   const [deleting, setDeleting] = useState(false)
   const [isPinned, setIsPinned] = useState(post.pinned || false)
   const [pinning, setPinning] = useState(false)
+  const [showShareMenu, setShowShareMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const shareMenuRef = useRef<HTMLDivElement>(null)
 
   // Kullanıcının mevcut oyunu yükle
   useEffect(() => {
@@ -45,6 +47,9 @@ export default function PostCard({ post, onDelete, onPinChange }: PostCardProps)
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowMenu(false)
+      }
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShowShareMenu(false)
       }
     }
 
@@ -321,10 +326,39 @@ export default function PostCard({ post, onDelete, onPinChange }: PostCardProps)
           </button>
 
           {/* Paylaş */}
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-            <i className="hgi-stroke hgi-share-08 text-lg"></i>
-            <span>Paylaş</span>
-          </button>
+          {/* Paylaş */}
+          <div className="relative" ref={shareMenuRef}>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowShareMenu(!showShareMenu)
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            >
+              <i className="hgi-stroke hgi-share-08 text-lg"></i>
+              <span>Paylaş</span>
+            </button>
+
+            {showShareMenu && (
+              <div className="absolute left-0 mt-1 w-48 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark py-1 z-50">
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    try {
+                      await navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`)
+                      setShowShareMenu(false)
+                    } catch (err) {
+                      console.error('Kopyalama hatası:', err)
+                    }
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2"
+                >
+                  <i className="hgi-stroke hgi-link-01 text-lg"></i>
+                  Bağlantıyı Kopyala
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

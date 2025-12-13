@@ -28,6 +28,7 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true)
   const [commentText, setCommentText] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [showShareMenu, setShowShareMenu] = useState(false)
   
   // Vote state
   const [voteState, setVoteState] = useState<'upvote' | 'downvote' | null>(null)
@@ -41,6 +42,7 @@ export default function PostDetailPage() {
   const [isPinned, setIsPinned] = useState(false)
   const [pinning, setPinning] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const shareMenuRef = useRef<HTMLDivElement>(null)
 
   // Silme yetkisi kontrolü
   const canDelete = user && post && (user.uid === post.authorId || user.role === 'admin')
@@ -147,6 +149,9 @@ export default function PostDetailPage() {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowMenu(false)
+      }
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShowShareMenu(false)
       }
     }
 
@@ -447,10 +452,34 @@ export default function PostDetailPage() {
               </div>
 
               {/* Paylaş */}
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                <i className="hgi-stroke hgi-share-08 text-lg"></i>
-                <span>Paylaş</span>
-              </button>
+              <div className="relative" ref={shareMenuRef}>
+                <button 
+                  onClick={() => setShowShareMenu(!showShareMenu)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                >
+                  <i className="hgi-stroke hgi-share-08 text-lg"></i>
+                  <span>Paylaş</span>
+                </button>
+
+                {showShareMenu && (
+                  <div className="absolute left-0 mt-1 w-48 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark py-1 z-50">
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(window.location.href)
+                          setShowShareMenu(false)
+                        } catch (err) {
+                          console.error('Kopyalama hatası:', err)
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2"
+                    >
+                      <i className="hgi-stroke hgi-link-01 text-lg"></i>
+                      Bağlantıyı Kopyala
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
