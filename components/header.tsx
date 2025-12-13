@@ -17,10 +17,17 @@ export default function Header() {
   const [showNicknameModal, setShowNicknameModal] = useState(false)
   const [showCreatePostModal, setShowCreatePostModal] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const hasCheckedNickname = useRef(false)
   
   const pathname = usePathname()
   const router = useRouter()
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      router.push(`/?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
 
   // Google login'den sonra nickname kontrolü
   useEffect(() => {
@@ -107,6 +114,9 @@ export default function Header() {
               className="form-input flex w-full min-w-0 flex-1 text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-surface-light dark:bg-surface-dark h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-4 pl-2 text-base"
               placeholder="OMÜ'de Ara..."
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
             />
           </div>
         </label>
