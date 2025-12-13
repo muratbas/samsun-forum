@@ -7,7 +7,7 @@ import SortControls from '@/components/SortControls'
 import PostFeed from '@/components/PostFeed'
 
 export default function Home() {
-  const [sortBy, setSortBy] = useState<'new' | 'popular' | 'top'>('popular')
+  const [sortBy, setSortBy] = useState<'new' | 'popular' | 'top'>('new')
 
   const handleSortChange = (sort: 'popular' | 'new' | 'top') => {
     setSortBy(sort)
