@@ -243,10 +243,10 @@ export default function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-12">
             <div className="max-w-md text-white mb-6">
               <h3 className="text-3xl font-bold mb-4 font-display">
-                Akademik sohbete katıl
+                Akademik topluluğa katıl
               </h3>
               <p className="text-lg opacity-90 font-light">
-                Araştırmalara erişin, fakülteyle bağlantı kurun ve en son kampüs etkinliklerinden haberdar olun.
+                OMÜForum ile kampüsteki gelişmeleri takip et, sorularını sor ve yeni arkadaşlıklar kur.
               </p>
             </div>
             
