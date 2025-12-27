@@ -13,7 +13,7 @@ export default function LeftSidebar() {
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary"
               href="/"
             >
-              <i className="bi bi-house-door text-lg"></i>
+              <i className="bi bi-house-door text-xl"></i>
               <span className="text-sm font-medium">Anasayfa</span>
             </a>
           </nav>
@@ -29,14 +29,14 @@ export default function LeftSidebar() {
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/notes"
             >
-              <i className="bi bi-journal-bookmark text-lg"></i>
+              <i className="bi bi-journal-bookmark text-xl"></i>
               <span className="text-sm font-normal">Not Bankası</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/professors"
             >
-              <i className="bi bi-mortarboard text-lg"></i>
+              <i className="bi bi-mortarboard text-xl"></i>
               <span className="text-sm font-normal">Hoca Değerlendirmeleri</span>
             </a>
           </nav>
@@ -52,28 +52,28 @@ export default function LeftSidebar() {
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/confessions"
             >
-              <i className="bi bi-incognito text-lg"></i>
+              <i className="hgi-stroke hgi-anonymous text-xl"></i>
               <span className="text-sm font-normal">İtiraflar</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/clubs"
             >
-              <i className="bi bi-people text-lg"></i>
+              <i className="bi bi-people text-xl"></i>
               <span className="text-sm font-normal">Kulüpler & Topluluklar</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/etkinlikler"
             >
-              <i className="bi bi-calendar-event text-lg"></i>
+              <i className="hgi-stroke hgi-calendar-01 text-xl"></i>
               <span className="text-sm font-normal">Etkinlik Takvimi</span>
             </a>
             <a
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               href="/cafeteria"
             >
-              <i className="bi bi-cup-hot text-lg"></i>
+              <i className="hgi-stroke hgi-restaurant-02 text-xl"></i>
               <span className="text-sm font-normal">Yemekhane Menüsü</span>
             </a>
           </nav>
