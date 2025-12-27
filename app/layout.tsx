@@ -30,9 +30,12 @@ const sfProDisplay = localFont({
 
 // Sayfa meta bilgileri (SEO için)
 export const metadata: Metadata = {
-  title: 'OMÜForum - Ondokuz Mayıs Üniversitesi Öğrenci Forumu',
+  title: 'OMÜForum',
   description: 'OMÜ öğrencilerinin dijital buluşma noktası. Not paylaşımı, etkinlikler, itiraflar ve daha fazlası.',
   keywords: ['omü', 'omu', 'ondokuz mayıs üniversitesi', 'forum', 'öğrenci', 'samsun', 'üniversite'],
+  icons: {
+    icon: '/omu-logo.png',
+  },
 }
 
 export default function RootLayout({
