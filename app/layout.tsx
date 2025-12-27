@@ -4,6 +4,7 @@ import './globals.css'
 import Header from '@/components/header'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { SidebarProvider } from '@/contexts/SidebarContext'
 
 // SF Pro Display Font
 const sfProDisplay = localFont({
@@ -65,10 +66,12 @@ export default function RootLayout({
       <body className={`${sfProDisplay.variable} font-sf-pro`}>
         <ThemeProvider>
           <AuthProvider>
-            <div className="relative flex min-h-screen w-full flex-col">
-              <Header />
-              {children}
-            </div>
+            <SidebarProvider>
+              <div className="relative flex min-h-screen w-full flex-col">
+                <Header />
+                {children}
+              </div>
+            </SidebarProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

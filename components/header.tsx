@@ -9,10 +9,12 @@ import LoginModal from './LoginModal'
 import NicknameModal from './NicknameModal'
 import CreatePostModal from './CreatePostModal'
 import Image from 'next/image'
+import { useSidebar } from '@/contexts/SidebarContext'
 
 export default function Header() {
   const { user, firebaseUser, loading, refreshUser } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { toggleSidebar } = useSidebar()
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showNicknameModal, setShowNicknameModal] = useState(false)
   const [showCreatePostModal, setShowCreatePostModal] = useState(false)
@@ -84,24 +86,35 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 sm:px-6 lg:px-8 py-3">
-      {/* Logo ve Marka */}
-      <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-        <Image 
-          src="/omu-logo.png" 
-          alt="OMÜ Logo" 
-          width={36}
-          height={36}
-          className="rounded-full object-cover"
-        />
-        {/* Desktop'ta tam isim */}
-        <h1 className="text-xl font-bold tracking-tight hidden sm:block">
-          OMÜForum
-        </h1>
-        {/* Mobile'da kısa */}
-        <h1 className="text-xl font-bold tracking-tight sm:hidden">
-          OMÜ
-        </h1>
-      </a>
+      {/* Sol taraf: Hamburger + Logo */}
+      <div className="flex items-center gap-4">
+        {/* Hamburger Menu - Sadece mobil/tablet */}
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden flex items-center justify-center p-2 -ml-2 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+
+        {/* Logo ve Marka */}
+        <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Image 
+            src="/omu-logo.png" 
+            alt="OMÜ Logo" 
+            width={36}
+            height={36}
+            className="rounded-full object-cover"
+          />
+          {/* Desktop'ta tam isim */}
+          <h1 className="text-xl font-bold tracking-tight hidden sm:block">
+            OMÜForum
+          </h1>
+          {/* Mobile'da kısa */}
+          <h1 className="text-xl font-bold tracking-tight sm:hidden">
+            OMÜ
+          </h1>
+        </a>
+      </div>
 
       {/* Arama Çubuğu - Sadece tablet+ */}
       <div className="hidden md:flex flex-1 justify-center px-8">
