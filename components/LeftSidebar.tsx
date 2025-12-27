@@ -54,13 +54,6 @@ export default function LeftSidebar() {
                 <i className="bi bi-journal-bookmark text-xl"></i>
                 <span className="text-sm font-normal">Not Bankası</span>
               </a>
-              <a
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                href="/professors"
-              >
-                <i className="bi bi-mortarboard text-xl"></i>
-                <span className="text-sm font-normal">Hoca Değerlendirmeleri</span>
-              </a>
             </nav>
           </div>
 
