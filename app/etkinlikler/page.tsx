@@ -113,59 +113,7 @@ export default function EventsPage() {
       <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0">
         <div className="sticky top-24 space-y-6">
           
-          {/* Mini Takvim Navigasyonu */}
-          <div className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark">
-            <p className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark mb-4">
-              Tarihe Git
-            </p>
-            <div className="flex min-w-full flex-col">
-              <div className="flex items-center p-1 justify-between mb-4">
-                <button 
-                  onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-                  className="flex items-center justify-center size-8 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                >
-                  <span className="material-symbols-outlined text-base">chevron_left</span>
-                </button>
-                <p className="text-sm font-bold leading-tight flex-1 text-center capitalize">
-                  {format(currentDate, 'MMMM yyyy', { locale: tr })}
-                </p>
-                <button 
-                  onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-                  className="flex items-center justify-center size-8 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                >
-                  <span className="material-symbols-outlined text-base">chevron_right</span>
-                </button>
-              </div>
-              
-              {/* Mini Takvim Grid */}
-              <div className="grid grid-cols-7 gap-1 mt-2 text-center">
-                {['P','S','Ç','P','C','C','P'].map(day => (
-                  <p key={day} className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold flex h-8 w-full items-center justify-center">
-                    {day}
-                  </p>
-                ))}
-                
-                {calendarDays.map((day, i) => {
-                  const isCurrentMonth = isSameMonth(day, currentDate)
-                  const isTodayDate = isToday(day)
-                  const isSelected = isSameDay(day, currentDate) // Belki seçili günü göstermek isteriz ama şimdilik sadece ayı gösteriyoruz
-                  
-                  return (
-                    <div 
-                      key={day.toISOString()} 
-                      className={`
-                        h-8 w-full flex items-center justify-center text-xs font-medium rounded-full
-                        ${!isCurrentMonth ? 'text-text-secondary-light/30 dark:text-text-secondary-dark/30' : 'text-text-primary-light dark:text-text-primary-dark'}
-                        ${isTodayDate ? 'bg-primary text-white' : ''}
-                      `}
-                    >
-                      {format(day, 'd')}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
+          {/* Mini Takvim Navigasyonu Kaldırıldı */}
 
           {/* Kategoriler */}
           <div className="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark">
@@ -205,10 +153,10 @@ export default function EventsPage() {
         <div className="flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex flex-col gap-1">
             <h1 className="text-text-primary-light dark:text-text-primary-dark text-4xl font-black leading-tight tracking-[-0.033em]">
-              Samsun Etkinlik Takvimi
+              Etkinlik Takvimi
             </h1>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-normal">
-              Samsun&apos;daki etkinlikleri görüntüle, filtrele ve takvime ekle.
+              Etkinlikleri görüntüle, filtrele ve takvime ekle.
             </p>
           </div>
           
@@ -226,27 +174,9 @@ export default function EventsPage() {
         {/* Kontroller */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
           <div className="w-full sm:w-auto">
-            <div className="flex h-10 items-center justify-center rounded-lg bg-black/5 dark:bg-border-dark p-1 text-sm font-medium">
-              <button 
-                onClick={() => setView('Month')}
-                className={`flex cursor-pointer h-full px-4 items-center justify-center rounded-lg transition-all ${view === 'Month' ? 'bg-surface-light dark:bg-surface-dark shadow-sm text-primary' : 'text-text-secondary-light dark:text-text-secondary-dark'}`}
-              >
-                Ay
-              </button>
-              {/* Şimdilik sadece Ay görünümü aktif, diğerleri sonra eklenebilir */}
-              <button 
-                disabled
-                className="flex cursor-pointer h-full px-4 items-center justify-center rounded-lg text-text-secondary-light/50 dark:text-text-secondary-dark/50 cursor-not-allowed"
-              >
-                Hafta
-              </button>
-              <button 
-                disabled
-                className="flex cursor-pointer h-full px-4 items-center justify-center rounded-lg text-text-secondary-light/50 dark:text-text-secondary-dark/50 cursor-not-allowed"
-              >
-                Liste
-              </button>
-            </div>
+            <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark capitalize">
+              {format(currentDate, 'MMMM yyyy', { locale: tr })}
+            </h2>
           </div>
           <div className="flex items-center gap-2">
             <button 

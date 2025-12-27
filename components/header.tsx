@@ -178,8 +178,7 @@ export default function Header() {
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-surface-light dark:bg-surface-dark rounded-lg shadow-lg border border-border-light dark:border-border-dark py-2 z-50">
                 <div className="px-4 py-2 border-b border-border-light dark:border-border-dark">
-                  <p className="font-bold text-sm">u/{user.nickname}</p>
-                  <p className="text-xs text-text-secondary-dark">{user.karma} karma</p>
+                  <p className="font-bold text-sm">{user.nickname}</p>
                 </div>
                 <button
                   onClick={handleLogout}

@@ -80,6 +80,18 @@ export default function LeftSidebar() {
         </div>
 
       </div>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-border-light/50 dark:border-border-dark/50 mt-auto">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-3 text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium">
+          <a href="#" className="hover:underline">Hakkımızda</a>
+          <a href="#" className="hover:underline">İletişim</a>
+          <a href="#" className="hover:underline">Kurallar</a>
+        </div>
+        <p className="text-[11px] text-text-secondary-light/60 dark:text-text-secondary-dark/60 leading-normal">
+          &copy; 2026 OMÜForum. <br/> Tüm hakları saklıdır.
+        </p>
+      </div>
     </aside>
   )
 }
