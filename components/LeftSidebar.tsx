@@ -49,7 +49,7 @@ export default function LeftSidebar() {
             <nav className="flex flex-col gap-0.5">
               <a
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                href="/notes"
+                href="/not-bankasi"
               >
                 <i className="bi bi-journal-bookmark text-xl"></i>
                 <span className="text-sm font-normal">Not Bankası</span>
@@ -65,14 +65,14 @@ export default function LeftSidebar() {
             <nav className="flex flex-col gap-0.5">
               <a
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                href="/confessions"
+                href="/itiraflar"
               >
                 <i className="hgi-stroke hgi-anonymous text-xl"></i>
                 <span className="text-sm font-normal">İtiraflar</span>
               </a>
               <a
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                href="/clubs"
+                href="/kulupler"
               >
                 <i className="bi bi-people text-xl"></i>
                 <span className="text-sm font-normal">Kulüpler & Topluluklar</span>
@@ -86,7 +86,9 @@ export default function LeftSidebar() {
               </a>
               <a
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                href="/cafeteria"
+                href="https://sks.omu.edu.tr/gunun-yemegi/"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <i className="hgi-stroke hgi-restaurant-02 text-xl"></i>
                 <span className="text-sm font-normal">Yemekhane Menüsü</span>
