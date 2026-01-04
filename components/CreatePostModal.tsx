@@ -165,9 +165,7 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
                 </button>
               ))}
             </div>
-            <p className="text-xs text-text-secondary-dark mt-2">
-              e.g., traffic, help, news
-            </p>
+
           </div>
 
           {/* Admin: Sabitle Toggle */}
