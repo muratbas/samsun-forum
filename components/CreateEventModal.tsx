@@ -133,7 +133,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
               <label className="block text-sm font-medium mb-1">Tarih</label>
               <div className="flex gap-2">
                 <select
-                  value={date.split('-')[2] || ''}
+                  value={parseInt(date.split('-')[2] || '1')}
                   onChange={(e) => {
                     const [y, m, d] = (date || `${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`).split('-')
                     setDate(`${y}-${m}-${e.target.value.padStart(2, '0')}`)
@@ -146,7 +146,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
                   ))}
                 </select>
                 <select
-                  value={date.split('-')[1] || ''}
+                  value={parseInt(date.split('-')[1] || '1')}
                   onChange={(e) => {
                     const [y, m, d] = (date || `${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`).split('-')
                     setDate(`${y}-${e.target.value.padStart(2, '0')}-${d}`)
@@ -159,7 +159,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
                   ))}
                 </select>
                 <select
-                  value={date.split('-')[0] || ''}
+                  value={parseInt(date.split('-')[0] || new Date().getFullYear().toString())}
                   onChange={(e) => {
                     const [y, m, d] = (date || `${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`).split('-')
                     setDate(`${e.target.value}-${m}-${d}`)
@@ -177,7 +177,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
               <label className="block text-sm font-medium mb-1">Saat</label>
               <div className="flex gap-2 items-center">
                 <select
-                  value={time.split(':')[0] || '12'}
+                  value={parseInt(time.split(':')[0] || '12')}
                   onChange={(e) => {
                     const m = time.split(':')[1] || '00'
                     setTime(`${e.target.value.padStart(2, '0')}:${m}`)
@@ -191,7 +191,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
                 </select>
                 <span className="font-bold">:</span>
                 <select
-                  value={time.split(':')[1] || '00'}
+                  value={parseInt(time.split(':')[1] || '00')}
                   onChange={(e) => {
                     const h = time.split(':')[0] || '12'
                     setTime(`${h}:${e.target.value.padStart(2, '0')}`)
