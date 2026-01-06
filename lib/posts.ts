@@ -252,8 +252,9 @@ export const updatePostScore = async (postId: string, upvotes: number, downvotes
 
     return true
   } catch (error) {
-    console.error('Post score güncelleme hatası:', error)
-    throw error
+    console.error('Post score güncelleme hatası (Permissions?):', error)
+    // Permission hatası olsa bile oy verilmiş sayılsın
+    return false
   }
 }
 
