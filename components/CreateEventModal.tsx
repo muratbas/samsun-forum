@@ -103,9 +103,8 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Açıklama</label>
+            <label className="block text-sm font-medium mb-1">Açıklama <span className="text-text-secondary-light/60 dark:text-text-secondary-dark/60 font-normal">(Opsiyonel)</span></label>
             <textarea
-              required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-4 py-2 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-primary resize-none"
