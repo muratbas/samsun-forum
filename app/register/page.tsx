@@ -306,12 +306,7 @@ export default function RegisterPage() {
               </p>
             </div>
             
-            {/* Simple Footer in Image Area */}
-            <div className="flex gap-6 text-sm text-white/70 font-medium">
-              <a href="#" className="hover:text-white transition-colors">Gizlilik Politikası</a>
-              <a href="#" className="hover:text-white transition-colors">Kullanım Şartları</a>
-              <a href="#" className="hover:text-white transition-colors">Destek</a>
-            </div>
+
           </div>
         </div>
 

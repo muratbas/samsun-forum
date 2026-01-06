@@ -20,6 +20,7 @@ import { getEvents, deleteEvent } from '@/lib/events'
 import { Event } from '@/types'
 import CreateEventModal from '@/components/CreateEventModal'
 import ConfirmModal from '@/components/ConfirmModal'
+import EventDetailModal from '@/components/EventDetailModal'
 
 const CATEGORIES = [
   'Konser',
@@ -39,6 +40,7 @@ export default function EventsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES)
   const [view, setView] = useState<'Month' | 'Week' | 'List'>('Month')
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   
   // Silme işlemi için state
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -244,25 +246,14 @@ export default function EventsPage() {
                     {dayEvents.map(event => (
                       <div 
                         key={event.id} 
+                        onClick={() => setSelectedEvent(event)}
                         className="group relative p-1.5 rounded bg-primary/10 text-primary text-xs font-semibold leading-tight text-left cursor-pointer hover:bg-primary hover:text-white transition-all overflow-hidden"
                       >
                         <div className="truncate">
                           {format(event.date.toDate(), 'HH:mm')} - {event.title}
                         </div>
                         
-                        {/* Admin Silme Butonu */}
-                        {user?.role === 'admin' && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setDeleteId(event.id)
-                            }}
-                            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-0.5 rounded-full bg-white text-primary hover:bg-red-100 hover:text-red-500 transition-opacity"
-                            title="Etkinliği Sil"
-                          >
-                            <span className="material-symbols-outlined text-[14px]">delete</span>
-                          </button>
-                        )}
+
                       </div>
                     ))}
                   </div>
@@ -292,6 +283,15 @@ export default function EventsPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
         loading={isDeleting}
+      />
+
+      <EventDetailModal 
+        event={selectedEvent} 
+        onClose={() => setSelectedEvent(null)} 
+        onDelete={(id) => {
+          setDeleteId(id)
+          setSelectedEvent(null)
+        }}
       />
     </div>
   )
