@@ -40,9 +40,14 @@ export const createComment = async (
     const docRef = await addDoc(collection(db, 'comments'), commentData)
     
     // Post'un yorum sayısını artır
-    await updateDoc(doc(db, 'posts', postId), {
-      commentCount: increment(1)
-    })
+    try {
+      await updateDoc(doc(db, 'posts', postId), {
+        commentCount: increment(1)
+      })
+    } catch (updateError) {
+      console.warn('Post yorum sayısı güncellenemedi (Permissions?):', updateError)
+      // Sayı güncellenemese de yorum oluştu, devam et
+    }
 
     return docRef.id
   } catch (error) {
