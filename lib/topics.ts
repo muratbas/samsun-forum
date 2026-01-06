@@ -66,6 +66,13 @@ export const TOPICS: Topic[] = [
     description: 'Merak ettiklerinizi sorun, cevaplayalım'
   },
   {
+    id: 'tavsiye',
+    name: 'Tavsiye',
+    slug: 'tavsiye',
+    icon: 'recommend',
+    description: 'Öneri ve tavsiyeler'
+  },
+  {
     id: 'kultur-sanat',
     name: 'Kültür & Sanat',
     slug: 'kultur-sanat',
